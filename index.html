@@ -1,230 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Modern World History | Activity Hub</title>
-  <style>
-    :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --accent: #38bdf8;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --border: #334155;
-      --success: #22c55e;
-    }
+<meta charset="UTF-8">
+<title>Modern World History — Course Hub</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Source+Sans+3:wght@400;500;600;700&family=Cormorant+Garamond:ital@1&display=swap');
 
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text);
-      margin: 0;
-      padding: 2rem;
-    }
+  :root{
+    --bg:#2c2d30;
+    --card:#38393d;
+    --ink:#2c2d30;
+    --parchment:#ececee;
+    --parchment-dim:#a4a5aa;
+    --neutral:#c7c8cc;
+    --neutral-bright:#e6e7ea;
+    --rule:rgba(255,255,255,0.14);
+  }
 
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
+  /* Unit color themes */
+  .theme-blue{--accent:#3f7fc4;--accent-bright:#8ec1f2;--accent-soft:rgba(63,127,196,0.14);}
+  .theme-purple{--accent:#8b5cf0;--accent-bright:#c3a8fb;--accent-soft:rgba(139,92,240,0.14);}
+  .theme-green{--accent:#3f9d63;--accent-bright:#8fdaa8;--accent-soft:rgba(63,157,99,0.14);}
+  .theme-red{--accent:#c8514f;--accent-bright:#f0938f;--accent-soft:rgba(200,81,79,0.14);}
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-      color: var(--accent);
-    }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--parchment);
+    font-family:'Source Sans 3', sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:36px 16px 70px;
+  }
 
-    p.subtitle {
-      color: var(--muted);
-      font-size: 1.1rem;
-    }
+  .stage{width:100%;max-width:1140px;}
 
-    .controls {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
+  /* ---------- Masthead ---------- */
+  .masthead{
+    text-align:center;
+    padding-bottom:24px;
+    margin-bottom:34px;
+    border-bottom:2px solid var(--rule);
+    position:relative;
+  }
+  .eyebrow{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--neutral-bright);
+    font-size:14px;
+    margin-bottom:8px;
+  }
+  .masthead h1{
+    font-family:'Playfair Display', serif;
+    font-weight:800;
+    font-size:clamp(32px,5.5vw,52px);
+    margin:0 0 10px;
+    letter-spacing:0.01em;
+  }
+  .masthead p{
+    color:var(--parchment-dim);
+    font-size:15.5px;
+    max-width:620px;
+    margin:0 auto;
+    line-height:1.55;
+  }
+  .compass{
+    width:46px;height:46px;margin:0 auto 14px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--neutral-bright), var(--neutral) 55%, #6a6b70 100%);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Playfair Display',serif;font-weight:800;font-size:20px;color:var(--ink);
+    box-shadow:0 4px 14px rgba(0,0,0,0.35);
+  }
 
-    .save-btn {
-      background: var(--success);
-      color: #fff;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: opacity 0.2s;
-    }
+  /* ---------- Legend ---------- */
+  .legend{
+    display:flex;justify-content:center;gap:22px;flex-wrap:wrap;
+    margin-bottom:32px;font-size:12.5px;color:var(--parchment-dim);
+    letter-spacing:0.03em;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .dot.live{background:#8fdaa8;}
+  .dot.soon{background:var(--parchment-dim);opacity:0.6;}
 
-    .save-btn:hover {
-      opacity: 0.9;
-    }
+  /* ---------- Unit grid ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:22px;
+  }
+  @media(min-width:760px){
+    .grid{grid-template-columns:1fr 1fr;}
+  }
 
-    .unit-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.5rem;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+  .unit-card{
+    background:linear-gradient(180deg, var(--card), rgba(56,57,61,0.4));
+    border:1px solid var(--rule);
+    border-top:3px solid var(--accent, var(--rule));
+    border-radius:8px;
+    padding:22px 22px 20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .unit-card::before{
+    content:"";
+    position:absolute; inset:0;
+    background:repeating-linear-gradient(115deg, rgba(255,255,255,0.012) 0 2px, transparent 2px 6px);
+    pointer-events:none;
+  }
 
-    .unit-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
+  .unit-head{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    margin-bottom:16px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--rule);
+  }
+  .unit-num{
+    flex:0 0 auto;
+    width:46px;height:46px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--accent-bright), var(--accent) 65%);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Playfair Display',serif;font-weight:800;font-size:18px;color:#1c1d1f;
+    box-shadow:0 3px 10px rgba(0,0,0,0.3);
+  }
+  .unit-titles h2{
+    font-family:'Playfair Display',serif;
+    font-size:19px;
+    margin:0;
+    line-height:1.25;
+  }
 
-    .unit-card h2 {
-      font-size: 1.5rem;
-      margin-top: 0;
-      margin-bottom: 1rem;
-      border-bottom: 2px solid var(--border);
-      padding-bottom: 0.5rem;
-      color: var(--accent);
-    }
+  .activities{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
 
-    .slot {
-      background: #0f172a;
-      border: 1px dashed var(--border);
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
+  .activity{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:11px 13px;
+    border-radius:5px;
+    border:1px solid transparent;
+    text-decoration:none;
+    color:var(--parchment);
+    font-size:13.5px;
+    transition:border-color .15s, background .15s, transform .1s;
+  }
+  .activity.live{
+    background:var(--accent-soft);
+    border-color:rgba(255,255,255,0.14);
+    cursor:pointer;
+  }
+  .activity.live:hover{
+    border-color:var(--accent-bright);
+    background:var(--accent-soft);
+    transform:translateX(2px);
+  }
+  .activity.soon{
+    background:rgba(255,255,255,0.02);
+    border:1px dashed rgba(255,255,255,0.14);
+    color:var(--parchment-dim);
+  }
+  .a-icon{
+    flex:0 0 auto;
+    width:26px;height:26px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;
+  }
+  .activity.live .a-icon{background:rgba(255,255,255,0.14);color:var(--accent-bright);}
+  .activity.soon .a-icon{background:rgba(255,255,255,0.06);color:var(--parchment-dim);}
+  .a-body{flex:1;min-width:0;}
+  .a-title{font-weight:600;display:block;}
+  .a-sub{display:block;font-size:11.5px;color:var(--parchment-dim);margin-top:1px;}
+  .activity.live .a-sub{color:var(--accent-bright);}
+  .a-arrow{flex:0 0 auto;font-size:15px;color:var(--accent-bright);opacity:0;transition:opacity .15s;}
+  .activity.live:hover .a-arrow{opacity:1;}
 
-    .slot:last-child {
-      margin-bottom: 0;
-    }
-
-    .slot-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin-bottom: 0.5rem;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: monospace;
-      padding: 0.5rem;
-      border-radius: 4px;
-      font-size: 0.85rem;
-      box-sizing: border-box;
-      margin-bottom: 0.5rem;
-    }
-
-    .activity-link {
-      display: inline-block;
-      color: var(--accent);
-      font-weight: bold;
-      text-decoration: none;
-      font-size: 0.9rem;
-      margin-top: 0.25rem;
-    }
-
-    .activity-link:hover {
-      text-decoration: underline;
-    }
-
-    .activity-link.disabled {
-      color: var(--muted);
-      pointer-events: none;
-      opacity: 0.5;
-      text-decoration: none;
-    }
-  </style>
+  footer.note{
+    text-align:center;color:var(--parchment-dim);font-size:12px;margin-top:36px;
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    line-height:1.6;
+  }
+</style>
 </head>
 <body>
-
-  <header>
-    <h1>Modern World History</h1>
-    <p class="subtitle">Class Activity & Resource Hub</p>
-  </header>
-
-  <div class="controls">
-    <button class="save-btn" onclick="saveData()">💾 Save All Links</button>
+<div class="stage">
+  <div class="masthead">
+    <div class="compass">✦</div>
+    <div class="eyebrow">10th Grade · Modern World History</div>
+    <h1>Course Hub</h1>
+    <p>Eight units, three activities each. Click any lit-up activity to launch it — new activities will light up here as they're added throughout the year.</p>
   </div>
 
-  <main class="unit-grid" id="grid"></main>
+  <div class="legend">
+    <span><i class="dot live"></i> Ready to launch</span>
+    <span><i class="dot soon"></i> Coming soon</span>
+  </div>
 
-  <script>
-    const totalUnits = 8;
-    const activitiesPerUnit = 3;
-    const grid = document.getElementById('grid');
+  <div class="grid" id="grid"></div>
 
-    // Generate 8 Units with 3 Activity slots each
-    for (let u = 1; u <= totalUnits; u++) {
-      const card = document.createElement('section');
-      card.className = 'unit-card';
-      let cardHTML = `<h2>Unit ${u}</h2>`;
+  <footer class="note">Each activity links to a file named unit#_activity#.html (e.g. unit1_activity1.html). Save new activity pages with that name, in the same folder as this page, and the matching slot will go live.</footer>
+</div>
 
-      for (let a = 1; a <= activitiesPerUnit; a++) {
-        const id = `u${u}-a${a}`;
-        cardHTML += `
-          <div class="slot">
-            <div class="slot-title">Activity ${a}</div>
-            <input type="text" id="${id}-input" placeholder="Paste link or game code URL..." oninput="updateLink('${id}')">
-            <div>
-              <a id="${id}-link" class="activity-link disabled" href="#" target="_blank" rel="noopener noreferrer">🚀 Launch Activity ${a} ↗</a>
-            </div>
-          </div>
-        `;
+<script>
+const THEME_BY_UNIT = {
+  1:'theme-blue',
+  2:'theme-purple',
+  3:'theme-green',
+  4:'theme-red',
+  5:'theme-blue',
+  6:'theme-purple',
+  7:'theme-red',
+  8:'theme-green'
+};
+
+const UNITS = [
+  { num:1 },
+  { num:2 },
+  { num:3 },
+  { num:4, activities:[ {ready:true, href:"enlightenment_game.html", newTab:true} ] },
+  { num:5 },
+  { num:6 },
+  { num:7 },
+  { num:8 }
+];
+
+function renderUnits(){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = UNITS.map(u=>{
+    const acts = [0,1,2].map(i=>{
+      const override = (u.activities && u.activities[i]) || {};
+      const href = override.href || `unit${u.num}_activity${i+1}.html`;
+      const ready = !!override.ready;
+      const label = `Activity ${i+1}`;
+      const sub = ready ? "Ready to launch" : "Coming soon";
+      const targetAttr = override.newTab ? ' target="_blank" rel="noopener"' : '';
+
+      if(ready){
+        return `<a class="activity live" href="${href}"${targetAttr}>
+          <span class="a-icon">▸</span>
+          <span class="a-body">
+            <span class="a-title">${label}</span>
+            <span class="a-sub">${sub}</span>
+          </span>
+          <span class="a-arrow">→</span>
+        </a>`;
       }
+      return `<a class="activity soon" href="${href}">
+        <span class="a-icon">○</span>
+        <span class="a-body">
+          <span class="a-title">${label}</span>
+          <span class="a-sub">${sub}</span>
+        </span>
+      </a>`;
+    }).join('');
 
-      card.innerHTML = cardHTML;
-      grid.appendChild(card);
-    }
+    return `<div class="unit-card ${THEME_BY_UNIT[u.num]}">
+      <div class="unit-head">
+        <div class="unit-num">${u.num}</div>
+        <div class="unit-titles">
+          <h2>Unit ${u.num}</h2>
+        </div>
+      </div>
+      <div class="activities">${acts}</div>
+    </div>`;
+  }).join('');
+}
 
-    // Convert input values into live hyperlinks
-    function updateLink(id) {
-      const input = document.getElementById(`${id}-input`);
-      const link = document.getElementById(`${id}-link`);
-      let val = input.value.trim();
-
-      if (val !== "") {
-        if (!val.startsWith("http://") && !val.startsWith("https://")) {
-          val = "https://" + val;
-        }
-        link.href = val;
-        link.classList.remove("disabled");
-      } else {
-        link.href = "#";
-        link.classList.add("disabled");
-      }
-    }
-
-    // Save inputs in browser local storage
-    function saveData() {
-      for (let u = 1; u <= totalUnits; u++) {
-        for (let a = 1; a <= activitiesPerUnit; a++) {
-          const id = `u${u}-a${a}`;
-          const inputVal = document.getElementById(`${id}-input`).value;
-          localStorage.setItem(`${id}-url`, inputVal);
-        }
-      }
-      alert("All activity links saved locally!");
-    }
-
-    // Load saved links on page startup
-    function loadData() {
-      for (let u = 1; u <= totalUnits; u++) {
-        for (let a = 1; a <= activitiesPerUnit; a++) {
-          const id = `u${u}-a${a}`;
-          const savedUrl = localStorage.getItem(`${id}-url`);
-
-          if (savedUrl) {
-            document.getElementById(`${id}-input`).value = savedUrl;
-            updateLink(id);
-          }
-        }
-      }
-    }
-
-    window.onload = loadData;
-  </script>
+renderUnits();
+</script>
 </body>
 </html>
