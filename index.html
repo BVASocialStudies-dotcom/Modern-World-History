@@ -1,279 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Modern World History — Course Hub</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Source+Sans+3:wght@400;500;600;700&family=Cormorant+Garamond:ital@1&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern World History</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --slot-bg: #0b1329;
+    }
 
-  :root{
-    --bg:#2c2d30;
-    --card:#38393d;
-    --ink:#2c2d30;
-    --parchment:#ececee;
-    --parchment-dim:#a4a5aa;
-    --neutral:#c7c8cc;
-    --neutral-bright:#e6e7ea;
-    --rule:rgba(255,255,255,0.14);
-  }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
 
-  /* Unit color themes */
-  .theme-blue{--accent:#3f7fc4;--accent-bright:#8ec1f2;--accent-soft:rgba(63,127,196,0.14);}
-  .theme-purple{--accent:#8b5cf0;--accent-bright:#c3a8fb;--accent-soft:rgba(139,92,240,0.14);}
-  .theme-green{--accent:#3f9d63;--accent-bright:#8fdaa8;--accent-soft:rgba(63,157,99,0.14);}
-  .theme-red{--accent:#c8514f;--accent-bright:#f0938f;--accent-soft:rgba(200,81,79,0.14);}
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
 
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    min-height:100vh;
-    background:var(--bg);
-    color:var(--parchment);
-    font-family:'Source Sans 3', sans-serif;
-    display:flex;
-    justify-content:center;
-    padding:36px 16px 70px;
-  }
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
 
-  .stage{width:100%;max-width:1140px;}
+    h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.025em;
+      margin-bottom: 0.5rem;
+    }
 
-  /* ---------- Masthead ---------- */
-  .masthead{
-    text-align:center;
-    padding-bottom:24px;
-    margin-bottom:34px;
-    border-bottom:2px solid var(--rule);
-    position:relative;
-  }
-  .eyebrow{
-    font-family:'Cormorant Garamond', serif;
-    font-style:italic;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color:var(--neutral-bright);
-    font-size:14px;
-    margin-bottom:8px;
-  }
-  .masthead h1{
-    font-family:'Playfair Display', serif;
-    font-weight:800;
-    font-size:clamp(32px,5.5vw,52px);
-    margin:0 0 10px;
-    letter-spacing:0.01em;
-  }
-  .masthead p{
-    color:var(--parchment-dim);
-    font-size:15.5px;
-    max-width:620px;
-    margin:0 auto;
-    line-height:1.55;
-  }
-  .compass{
-    width:46px;height:46px;margin:0 auto 14px;
-    border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, var(--neutral-bright), var(--neutral) 55%, #6a6b70 100%);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Playfair Display',serif;font-weight:800;font-size:20px;color:var(--ink);
-    box-shadow:0 4px 14px rgba(0,0,0,0.35);
-  }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
 
-  /* ---------- Legend ---------- */
-  .legend{
-    display:flex;justify-content:center;gap:22px;flex-wrap:wrap;
-    margin-bottom:32px;font-size:12.5px;color:var(--parchment-dim);
-    letter-spacing:0.03em;
-  }
-  .legend span{display:inline-flex;align-items:center;gap:6px;}
-  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
-  .dot.live{background:#8fdaa8;}
-  .dot.soon{background:var(--parchment-dim);opacity:0.6;}
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 1400px;
+    }
 
-  /* ---------- Unit grid ---------- */
-  .grid{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:22px;
-  }
-  @media(min-width:760px){
-    .grid{grid-template-columns:1fr 1fr;}
-  }
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
 
-  .unit-card{
-    background:linear-gradient(180deg, var(--card), rgba(56,57,61,0.4));
-    border:1px solid var(--rule);
-    border-top:3px solid var(--accent, var(--rule));
-    border-radius:8px;
-    padding:22px 22px 20px;
-    position:relative;
-    overflow:hidden;
-  }
-  .unit-card::before{
-    content:"";
-    position:absolute; inset:0;
-    background:repeating-linear-gradient(115deg, rgba(255,255,255,0.012) 0 2px, transparent 2px 6px);
-    pointer-events:none;
-  }
+    .card h2 {
+      font-size: 1.5rem;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
 
-  .unit-head{
-    display:flex;
-    align-items:flex-start;
-    gap:14px;
-    margin-bottom:16px;
-    padding-bottom:14px;
-    border-bottom:1px solid var(--rule);
-  }
-  .unit-num{
-    flex:0 0 auto;
-    width:46px;height:46px;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, var(--accent-bright), var(--accent) 65%);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Playfair Display',serif;font-weight:800;font-size:18px;color:#1c1d1f;
-    box-shadow:0 3px 10px rgba(0,0,0,0.3);
-  }
-  .unit-titles h2{
-    font-family:'Playfair Display',serif;
-    font-size:19px;
-    margin:0;
-    line-height:1.25;
-  }
+    .embed-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
 
-  .activities{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
+    /* Container for pasting raw HTML, CSS, & JS code */
+    .embed-slot {
+      background-color: var(--slot-bg);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
 
-  .activity{
-    display:flex;
-    align-items:center;
-    gap:11px;
-    padding:11px 13px;
-    border-radius:5px;
-    border:1px solid transparent;
-    text-decoration:none;
-    color:var(--parchment);
-    font-size:13.5px;
-    transition:border-color .15s, background .15s, transform .1s;
-  }
-  .activity.live{
-    background:var(--accent-soft);
-    border-color:rgba(255,255,255,0.14);
-    cursor:pointer;
-  }
-  .activity.live:hover{
-    border-color:var(--accent-bright);
-    background:var(--accent-soft);
-    transform:translateX(2px);
-  }
-  .activity.soon{
-    background:rgba(255,255,255,0.02);
-    border:1px dashed rgba(255,255,255,0.14);
-    color:var(--parchment-dim);
-  }
-  .a-icon{
-    flex:0 0 auto;
-    width:26px;height:26px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-size:12px;
-  }
-  .activity.live .a-icon{background:rgba(255,255,255,0.14);color:var(--accent-bright);}
-  .activity.soon .a-icon{background:rgba(255,255,255,0.06);color:var(--parchment-dim);}
-  .a-body{flex:1;min-width:0;}
-  .a-title{font-weight:600;display:block;}
-  .a-sub{display:block;font-size:11.5px;color:var(--parchment-dim);margin-top:1px;}
-  .activity.live .a-sub{color:var(--accent-bright);}
-  .a-arrow{flex:0 0 auto;font-size:15px;color:var(--accent-bright);opacity:0;transition:opacity .15s;}
-  .activity.live:hover .a-arrow{opacity:1;}
+    .embed-slot header {
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 0.4rem 0.75rem;
+      margin-bottom: 0;
+      text-align: left;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
 
-  footer.note{
-    text-align:center;color:var(--parchment-dim);font-size:12px;margin-top:36px;
-    font-family:'Cormorant Garamond',serif;font-style:italic;
-    line-height:1.6;
-  }
-</style>
+    /* Raw Code Placement Wrapper */
+    .raw-code-container {
+      padding: 1rem;
+      color: var(--text);
+    }
+  </style>
 </head>
 <body>
-<div class="stage">
-  <div class="masthead">
-    <div class="compass">✦</div>
-    <div class="eyebrow">10th Grade · Modern World History</div>
-    <h1>Course Hub</h1>
-    <p>Eight units, three activities each. Click any lit-up activity to launch it — new activities will light up here as they're added throughout the year.</p>
-  </div>
 
-  <div class="legend">
-    <span><i class="dot live"></i> Ready to launch</span>
-    <span><i class="dot soon"></i> Coming soon</span>
-  </div>
+  <header>
+    <h1>Modern World History</h1>
+    <p class="subtitle">Unit Portals and Embedded Code Slots</p>
+  </header>
 
-  <div class="grid" id="grid"></div>
+  <main class="grid">
 
-  <footer class="note">Each activity links to a file named unit#_activity#.html (e.g. unit1_activity1.html). Save new activity pages with that name, in the same folder as this page, and the matching slot will go live.</footer>
-</div>
+    <!-- Unit 1 -->
+    <div class="card">
+      <h2>Unit 1</h2>
+      <div class="embed-container">
 
-<script>
-const THEME_BY_UNIT = {
-  1:'theme-blue',
-  2:'theme-purple',
-  3:'theme-green',
-  4:'theme-red',
-  5:'theme-blue',
-  6:'theme-purple',
-  7:'theme-red',
-  8:'theme-green'
-};
-
-const UNITS = [
-  { num:1 },
-  { num:2 },
-  { num:3 },
-  { num:4 },
-  { num:5 },
-  { num:6 },
-  { num:7 },
-  { num:8 }
-];
-
-function renderUnits(){
-  const grid = document.getElementById('grid');
-  grid.innerHTML = UNITS.map(u=>{
-    const acts = [0,1,2].map(i=>{
-      const override = (u.activities && u.activities[i]) || {};
-      const ready = !!override.ready;
-      const label = `Activity ${i+1}`;
-      const sub = ready ? "Ready to launch" : "Coming soon";
-
-      if(ready){
-        const href = override.href || `unit${u.num}_activity${i+1}.html`;
-        const targetAttr = override.newTab ? ' target="_blank" rel="noopener"' : '';
-        return `<a class="activity live" href="${href}"${targetAttr}>
-          <span class="a-icon">▸</span>
-          <span class="a-body">
-            <span class="a-title">${label}</span>
-            <span class="a-sub">${sub}</span>
-          </span>
-          <span class="a-arrow">→</span>
-        </a>`;
-      }
-      const href = override.href || `unit${u.num}_activity${i+1}.html`;
-      return `<a class="activity soon" href="${href}">
-        <span class="a-icon">○</span>
-        <span class="a-body">
-          <span class="a-title">${label}</span>
-          <span class="a-sub">${sub}</span>
-        </span>
-      </a>`;
-    }).join('');
-
-    return `<div class="unit-card ${THEME_BY_UNIT[u.num]}">
-      <div class="unit-head">
-        <div class="unit-num">${u.num}</div>
-        <div class="unit-titles">
-          <h2>Unit ${u.num}</h2>
+        <div class="embed-slot">
+          <header>Unit 1 - Website / App 1</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 1 HERE -->
+          </div>
         </div>
-      </div>
-      <div class="activities">${acts}</div>
-    </div>`;
-  }).join('');
-}
 
-renderUnits();
-</script>
+        <div class="embed-slot">
+          <header>Unit 1 - Website / App 2</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 2 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 1 - Website / App 3</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 3 HERE -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Unit 2 -->
+    <div class="card">
+      <h2>Unit 2</h2>
+      <div class="embed-container">
+
+        <div class="embed-slot">
+          <header>Unit 2 - Website / App 1</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 1 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 2 - Website / App 2</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 2 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 2 - Website / App 3</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 3 HERE -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Unit 3 -->
+    <div class="card">
+      <h2>Unit 3</h2>
+      <div class="embed-container">
+
+        <div class="embed-slot">
+          <header>Unit 3 - Website / App 1</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 1 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 3 - Website / App 2</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 2 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 3 - Website / App 3</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 3 HERE -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Unit 4 -->
+    <div class="card">
+      <h2>Unit 4</h2>
+      <div class="embed-container">
+
+        <div class="embed-slot">
+          <header>Unit 4 - Website / App 1</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 1 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 4 - Website / App 2</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 2 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 4 - Website / App 3</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 3 HERE -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Unit 5 -->
+    <div class="card">
+      <h2>Unit 5</h2>
+      <div class="embed-container">
+
+        <div class="embed-slot">
+          <header>Unit 5 - Website / App 1</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 1 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 5 - Website / App 2</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 2 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 5 - Website / App 3</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 3 HERE -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Unit 6 -->
+    <div class="card">
+      <h2>Unit 6</h2>
+      <div class="embed-container">
+
+        <div class="embed-slot">
+          <header>Unit 6 - Website / App 1</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 1 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 6 - Website / App 2</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 2 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 6 - Website / App 3</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 3 HERE -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Unit 7 -->
+    <div class="card">
+      <h2>Unit 7</h2>
+      <div class="embed-container">
+
+        <div class="embed-slot">
+          <header>Unit 7 - Website / App 1</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 1 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 7 - Website / App 2</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 2 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 7 - Website / App 3</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 3 HERE -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Unit 8 -->
+    <div class="card">
+      <h2>Unit 8</h2>
+      <div class="embed-container">
+
+        <div class="embed-slot">
+          <header>Unit 8 - Website / App 1</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 1 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 8 - Website / App 2</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 2 HERE -->
+          </div>
+        </div>
+
+        <div class="embed-slot">
+          <header>Unit 8 - Website / App 3</header>
+          <div class="raw-code-container">
+            <!-- PASTE RAW HTML, CSS, AND JAVASCRIPT CODE FOR SITE 3 HERE -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
 </body>
 </html>
