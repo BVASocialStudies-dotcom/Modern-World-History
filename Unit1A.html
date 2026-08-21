@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a State: The Rise of Bureaucracy</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #0b1325;
+            color: #d0e1fd;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        #game-container {
+            max-width: 900px;
+            width: 100%;
+            background-color: #121e36;
+            border: 4px solid #3b5998;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #8cb4f5;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .status-panel {
+            display: flex;
+            justify-content: space-between;
+            background-color: #0b1325;
+            padding: 12px 18px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #23395d;
+            font-size: 1em;
+        }
+        .map-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-bottom: 15px;
+            border: 3px solid #3b5998;
+            border-radius: 6px;
+            background: radial-gradient(circle, #1c2d42 0%, #0b1325 100%);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .map-region {
+            border: 2px dashed #23395d;
+            border-radius: 6px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(18, 30, 54, 0.7);
+            transition: all 0.3s ease;
+        }
+        .map-region.active {
+            border-color: #8cb4f5;
+            box-shadow: 0 0 10px rgba(140, 180, 245, 0.4);
+            background-color: rgba(35, 57, 93, 0.5);
+        }
+        .map-region.bureaucrat {
+            border-color: #4a7bb0;
+            background-color: rgba(21, 43, 76, 0.8);
+        }
+        .region-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #8cb4f5;
+        }
+        .region-type {
+            font-size: 0.85em;
+            color: #a4c2f4;
+            margin-top: 4px;
+        }
+        .fief-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .fief-card {
+            background-color: #182846;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #23395d;
+            text-align: center;
+            font-size: 0.95em;
+        }
+        .fief-card.bureaucrat {
+            border-color: #4a7bb0;
+            background-color: #101f38;
+            color: #9cbdf0;
+        }
+        .scenario-box {
+            background-color: #0d172a;
+            border-left: 4px solid #8cb4f5;
+            padding: 15px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 1.05em;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            background-color: #1f3354;
+            color: #d0e1fd;
+            border: 1px solid #3b5998;
+            padding: 12px 15px;
+            font-size: 15px;
+            font-family: 'Georgia', serif;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+            text-align: left;
+        }
+        button:hover:not(:disabled) {
+            background-color: #3b5998;
+            color: #fff;
+        }
+        button:disabled {
+            background-color: #0b1325;
+            color: #415273;
+            border-color: #182846;
+            cursor: not-allowed;
+        }
+        .feedback-box {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #0b1325;
+            border: 1px solid #3b5998;
+            color: #8cb4f5;
+            display: none;
+            line-height: 1.4;
+        }
+        .next-btn {
+            margin-top: 15px;
+            background-color: #3b5998;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+            display: block;
+            width: 100%;
+        }
+        .next-btn:hover {
+            background-color: #4f73be;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>Create a State</h1>
+    <h2>Kingdom of Aethelgard</h2>
+
+    <div class="status-panel">
+        <div><strong>Round:</strong> <span id="round-num">1</span></div>
+        <div><strong>Resources Left:</strong> 
+            🗡️ Armies: <span id="army-count">4</span> | 
+            📜 Bureaucrats: <span id="bureaucrat-count">∞</span> | 
+            💰 Bribes: <span id="gold-count">3</span> | 
+            👑 Marriages: <span id="marriage-count">2</span>
+        </div>
+    </div>
+
+    <!-- Dynamic Map Display -->
+    <div class="map-wrapper">
+        <div class="map-region" id="map-Silverhold">
+            <span class="region-name">⛰️ Silverhold</span>
+            <span class="region-type" id="map-status-Silverhold">Feudal Domain</span>
+        </div>
+        <div class="map-region" id="map-Verdantia">
+            <span class="region-name">🌾 Verdantia</span>
+            <span class="region-type" id="map-status-Verdantia">Feudal Domain</span>
+        </div>
+        <div class="map-region" id="map-Ironvale">
+            <span class="region-name">⚒️ Ironvale</span>
+            <span class="region-type" id="map-status-Ironvale">Feudal Domain</span>
+        </div>
+        <div class="map-region" id="map-Misthaven">
+            <span class="region-name">🌲 Misthaven</span>
+            <span class="region-type" id="map-status-Misthaven">Feudal Domain</span>
+        </div>
+    </div>
+
+    <!-- Status Cards -->
+    <div class="fief-grid">
+        <div class="fief-card" id="fief-Silverhold"><strong>Silverhold</strong><br><span class="status">⚔️ Feudal Lord</span></div>
+        <div class="fief-card" id="fief-Verdantia"><strong>Verdantia</strong><br><span class="status">⚔️ Feudal Lord</span></div>
+        <div class="fief-card" id="fief-Ironvale"><strong>Ironvale</strong><br><span class="status">⚔️ Feudal Lord</span></div>
+        <div class="fief-card" id="fief-Misthaven"><strong>Misthaven</strong><br><span class="status">⚔️ Feudal Lord</span></div>
+    </div>
+
+    <div class="scenario-box" id="scenario-text">
+        Loading crisis...
+    </div>
+
+    <div class="options-container" id="options-box"></div>
+
+    <div class="feedback-box" id="feedback-box">
+        <div id="feedback-text"></div>
+        <button class="next-btn" id="next-round-btn" onclick="advanceRound()">Proceed to Next Round ➔</button>
+    </div>
+</div>
+
+<script>
+const state = {
+    round: 1,
+    resources: { army: 4, bureaucrat: Infinity, gold: 3, marriage: 2 },
+    fiefs: {
+        Silverhold: "Noble",
+        Verdantia: "Noble",
+        Ironvale: "Noble",
+        Misthaven: "Noble"
+    }
+};
+
+const crisesTemplates = {
+    Silverhold: [
+        "The Duke of Silverhold has blockaded the high mountain passes, cutting off royal trade caravans. His herald arrives with a demand: the crown must grant his fief tax-exempt status or reimburse his house for 'protecting the northern realm.'",
+        "Silverhold's silver mines have struck rich new veins, but the Duke refuses to send the crown its customary share. He demands a royal alliance that will permanently secure his family's prestige.",
+        "The Duke of Silverhold revolts over royal tax levies once more! His garrisons are dug into stone mountain fortresses."
+    ],
+    Verdantia: [
+        "Following a booming harvest, the Earl of Verdantia hoards grain in granaries while royal stores run low. He sends word that he will release the grain only in exchange for a direct treasury grant.",
+        "The Earl of Verdantia refuses to supply his mandatory quota of foot soldiers to the royal army. He demands a blood union with the royal house.",
+        "Verdantia rebels over agricultural taxes once more! Private noble militias control the fields."
+    ],
+    Ironvale: [
+        "The Baron of Ironvale shelters outlawed traitors within his iron-clad fortresses and openly mocks royal decrees.",
+        "Ironvale's smiths produce the finest weapons in the realm, but the Baron refuses to arm the king's forces without an exorbitant payment.",
+        "Ironvale nobles take up arms against royal decrees yet again! The fortress walls are strong and rebellious."
+    ],
+    Misthaven: [
+        "The Lord of Misthaven refuses to deploy his famed marsh archers to the royal host, demanding a prestigious royal marriage for his heir.",
+        "Border lords in Misthaven operate as an autonomous syndicate, intercepting merchant barges on the riverways.",
+        "Misthaven rises in defiance one last time! The swamps make military campaigns treacherous."
+    ]
+};
+
+let currentTarget = null;
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function checkAllControlled() {
+    return Object.values(state.fiefs).every(status => status === "Bureaucrat");
+}
+
+function selectNextTarget() {
+    const uncollectedFiefs = Object.keys(state.fiefs).filter(fief => state.fiefs[fief] === "Noble");
+    if (uncollectedFiefs.length === 0) return null;
+    
+    const shuffled = shuffleArray([...uncollectedFiefs]);
+    return shuffled[0];
+}
+
+function updateUI() {
+    document.getElementById("round-num").innerText = state.round;
+    document.getElementById("army-count").innerText = state.resources.army;
+    document.getElementById("bureaucrat-count").innerText = "∞";
+    document.getElementById("gold-count").innerText = state.resources.gold;
+    document.getElementById("marriage-count").innerText = state.resources.marriage;
+    document.getElementById("feedback-box").style.display = "none";
+
+    if (checkAllControlled()) {
+        endGame();
+        return;
+    }
+
+    currentTarget = selectNextTarget();
+
+    for (let fief in state.fiefs) {
+        const cardEl = document.getElementById(`fief-${fief}`);
+        const mapEl = document.getElementById(`map-${fief}`);
+        const mapStatusEl = document.getElementById(`map-status-${fief}`);
+
+        mapEl.classList.remove("active");
+
+        if (state.fiefs[fief] === "Bureaucrat") {
+            cardEl.classList.add("bureaucrat");
+            cardEl.querySelector(".status").innerText = "📜 Bureaucrat";
+            mapEl.classList.add("bureaucrat");
+            mapStatusEl.innerText = "📜 Royal Bureaucracy";
+        } else if (fief === currentTarget) {
+            mapEl.classList.add("active");
+            mapStatusEl.innerText = "⚠️ In Rebellion!";
+        } else {
+            mapStatusEl.innerText = "⚔️ Feudal Lord";
+        }
+    }
+
+    const templates = crisesTemplates[currentTarget];
+    const scenario = templates[Math.floor(Math.random() * templates.length)];
+    document.getElementById("scenario-text").innerText = `Round ${state.round}: ${scenario}`;
+
+    renderOptions();
+}
+
+function renderOptions() {
+    const box = document.getElementById("options-box");
+    box.innerHTML = "";
+    box.style.display = "flex";
+
+    const options = [
+        { id: "army", label: `🗡️ Send Military (Uses left: ${state.resources.army})` },
+        { id: "gold", label: `💰 Pay Bribe (Uses left: ${state.resources.gold})` },
+        { id: "marriage", label: `👑 Royal Marriage (Uses left: ${state.resources.marriage})` }
+    ];
+
+    // Unlocks only after Round 6 and appends to the bottom of the list
+    if (state.round >= 7) {
+        options.push({ id: "bureaucrat", label: `📜 Replace Noble with Bureaucrat (Unlimited)` });
+    }
+
+    options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.innerText = opt.label;
+        btn.disabled = state.resources[opt.id] <= 0;
+        btn.onclick = () => handleChoice(opt.id);
+        box.appendChild(btn);
+    });
+}
+
+function handleChoice(type) {
+    const feedbackBox = document.getElementById("feedback-box");
+    const feedbackText = document.getElementById("feedback-text");
+
+    if (type !== "bureaucrat") {
+        state.resources[type]--;
+    }
+
+    if (type === "bureaucrat") {
+        state.fiefs[currentTarget] = "Bureaucrat";
+        feedbackText.innerHTML = `<strong>State Bureaucracy Established:</strong> You replaced the feudal lord of <em>${currentTarget}</em> with a salaried bureaucrat loyal directly to the Crown. <em>${currentTarget}</em> will never rebel again!`;
+    } else {
+        feedbackText.innerHTML = `<strong>Temporary Peace:</strong> You used <strong>${type.toUpperCase()}</strong> to placate <em>${currentTarget}</em>. However, the feudal noble retains power and may rebel again...`;
+    }
+
+    document.getElementById("options-box").style.display = "none";
+    feedbackBox.style.display = "block";
+}
+
+function advanceRound() {
+    state.round++;
+    updateUI();
+}
+
+function endGame() {
+    document.getElementById("scenario-text").innerHTML = `<h3>Total Absolute Victory!</h3><p>By Round ${state.round}, you have successfully abolished the traditional feudal structure across Silverhold, Verdantia, Ironvale, and Misthaven. Every province is now directly governed by appointed royal bureaucrats loyal exclusively to the Crown!</p>`;
+    document.getElementById("options-box").innerHTML = "";
+    document.getElementById("feedback-box").style.display = "none";
+
+    for (let fief in state.fiefs) {
+        const cardEl = document.getElementById(`fief-${fief}`);
+        const mapEl = document.getElementById(`map-${fief}`);
+        const mapStatusEl = document.getElementById(`map-status-${fief}`);
+
+        cardEl.classList.add("bureaucrat");
+        cardEl.querySelector(".status").innerText = "📜 Bureaucrat";
+        mapEl.classList.remove("active");
+        mapEl.classList.add("bureaucrat");
+        mapStatusEl.innerText = "📜 Royal Bureaucracy";
+    }
+}
+
+updateUI();
+</script>
+</body>
+</html>
