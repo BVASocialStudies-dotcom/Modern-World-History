@@ -127,8 +127,6 @@ button,textarea,input{font:inherit;color:inherit;}
 .chip.wrong .chip-state{color:var(--bad);}
 .chip.dim{opacity:.55;}
 
-.ev-note{margin-top:1.1rem;}
-.ev-note label{display:block;font-weight:600;font-size:.92rem;margin-bottom:.3rem;}
 textarea,input[type="text"]{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:.6rem .75rem;resize:vertical;}
 .actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem;align-items:center;}
 
@@ -920,17 +918,6 @@ function buildEvent(idx){
   });
   quiz.appendChild(grid);
 
-  var note = el("div", "ev-note");
-  var lab = el("label", null, "Your strongest piece of evidence (optional but recommended)");
-  lab.setAttribute("for", "evNote");
-  var ta = el("textarea");
-  ta.id = "evNote"; ta.rows = 3;
-  ta.placeholder = "Which detail above convinced you, and which characteristic does it show?";
-  ta.value = a.ev || "";
-  ta.addEventListener("input", function(){ a.ev = ta.value; save(); });
-  note.appendChild(lab); note.appendChild(ta);
-  quiz.appendChild(note);
-
   if(!a.done){
     var act = el("div", "actions");
     chk.addEventListener("click", function(){
@@ -1056,7 +1043,6 @@ function buildResultsText(){
     var names = a.sel.map(function(id){ return CHAR_BY_ID[id].name; }).join(", ");
     lines.push(ev.year + ": " + ev.title);
     lines.push("  My picks: " + (names || "none"));
-    if(a.ev) lines.push("  My evidence: " + a.ev);
   });
   lines.push("");
   REFLECT_Q.forEach(function(q, i){
@@ -1122,7 +1108,6 @@ function buildResults(){
       tags.appendChild(tg);
     });
     li.appendChild(tags);
-    if(a.ev) li.appendChild(el("div", null, "Evidence: " + a.ev));
     list.appendChild(li);
   });
   if(!any) list.appendChild(el("li", null, "No events checked yet."));
