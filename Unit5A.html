@@ -1,1 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>From Empire to Civil War: China, 1911–1937</title>
+<style>
+:root{
+  --desk:#d8dfe6;
+  --slip:#fbfcfd;
+  --ink:#1b2440;
+  --ink-2:#4a5670;
+  --rule:#8a97ab;
+  --red:#c23b31;
+  --teal:#1d7a6c;
+  --teal-bg:#e0f2ee;
+  --amber:#b95f0a;
+  --amber-bg:#fdeed9;
+  --slab:"Rockwell","Roboto Slab","Cambria","Georgia",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  --hard:3px 3px 0 rgba(27,36,64,.22);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{
+  background:var(--desk);
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 31px,rgba(27,36,64,.07) 31px,rgba(27,36,64,.07) 32px);
+  color:var(--ink);
+  font:16px/1.5 var(--sans);
+  -webkit-text-size-adjust:100%;
+}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px 0}
 
+/* ---------- masthead ---------- */
+.masthead{padding:30px 0 14px}
+h1,h2,h3{font-family:var(--slab);margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(1.65rem,4.2vw,2.6rem);line-height:1.1;max-width:20ch}
+.lede{margin:12px 0 0;max-width:64ch;color:var(--ink-2);font-size:1.02rem}
+.lede strong{color:var(--ink)}
+
+/* ---------- stats ---------- */
+.stats{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;margin:14px 0 18px}
+.stat{display:flex;align-items:baseline;gap:8px;background:var(--slip);border:2px solid var(--ink);padding:6px 12px}
+.stat b{font:700 1.25rem/1 var(--slab)}
+.stat span{font-size:.88rem;color:var(--ink-2)}
+.stats .btn{margin-left:auto}
+
+/* ---------- buttons ---------- */
+.btn{font:600 .95rem/1 var(--sans);min-height:44px;padding:0 18px;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.btn:hover:not(:disabled){background:var(--ink);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--red);border-color:var(--red);color:#fff}
+.btn.primary:hover:not(:disabled){background:#a12e26;border-color:#a12e26}
+.dock .btn.light{border-color:rgba(255,255,255,.65);color:#fff}
+.dock .btn.light:hover:not(:disabled){background:#fff;color:var(--ink)}
+
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:minmax(290px,390px) 1fr;gap:28px;align-items:start}
+.section-title{font-size:1.2rem;margin-bottom:4px}
+.help{margin:0 0 12px;font-size:.88rem;color:var(--ink-2)}
+
+/* ---------- bank ---------- */
+.bank{background:rgba(251,252,253,.55);border:2px solid var(--ink);padding:14px;position:sticky;top:16px;max-height:calc(100vh - 110px);overflow:auto;transition:background .12s}
+.bank.hover{background:var(--slip);outline:3px dashed var(--red);outline-offset:-6px}
+.bank-list{display:grid;gap:10px}
+.bank-empty{margin:6px 0 2px;padding:16px;border:2px dashed var(--rule);color:var(--ink-2);text-align:left;font-size:.92rem}
+
+/* ---------- cards (dispatch slips) ---------- */
+.card{position:relative;display:flex;gap:8px;background:var(--slip);border:2px solid var(--ink);border-left-width:7px;padding:10px 12px 10px 4px;cursor:grab;user-select:none;-webkit-user-select:none;box-shadow:var(--hard);transition:transform .12s,box-shadow .12s}
+@media (hover:hover){.card:not(.locked):hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 rgba(27,36,64,.25)}}
+.card.selected{outline:3px solid var(--red);outline-offset:2px}
+.card.dragging{opacity:.3}
+.card.locked{cursor:pointer;background:var(--teal-bg);border-color:var(--teal);box-shadow:3px 3px 0 rgba(29,122,108,.3)}
+.card.wrong{background:var(--amber-bg);border-color:var(--amber);box-shadow:3px 3px 0 rgba(185,95,10,.28)}
+.card.shake{animation:shake .4s}
+.grip{flex:none;width:24px;align-self:stretch;display:grid;place-items:center;touch-action:none;cursor:grab;color:var(--rule)}
+.grip::before{content:"";width:10px;height:22px;background-image:radial-gradient(currentColor 1.5px,transparent 1.8px);background-size:5px 7px}
+@media (pointer:coarse){.grip{width:38px}}
+.tick{flex:none;width:24px;display:grid;place-items:start center;padding-top:1px;color:var(--teal);font-weight:800}
+.cbody{min-width:0}
+.ctitle{font:700 1.02rem/1.25 var(--slab)}
+.cclue{margin-top:4px;font-size:.87rem;line-height:1.42;color:var(--ink-2)}
+.card.locked .cclue{color:var(--ink)}
+.miss{display:inline-block;margin-top:7px;font-size:.84rem;font-weight:700;color:var(--amber)}
+
+/* the date stamp: the one loud thing */
+.stamp{display:inline-block;margin-top:8px;padding:3px 9px;border:2px solid var(--teal);border-radius:3px;color:var(--teal);font:700 .78rem/1.25 var(--mono);letter-spacing:.05em;text-transform:uppercase;transform:rotate(-2deg);background:rgba(255,255,255,.55)}
+.stamp.fresh{animation:stamp .5s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes stamp{0%{transform:scale(1.8) rotate(-10deg);opacity:0}55%{opacity:1}100%{transform:scale(1) rotate(-2deg);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+
+/* ghost while dragging */
+.ghost{position:fixed;left:0;top:0;z-index:1000;pointer-events:none;margin:0;box-shadow:8px 10px 0 rgba(27,36,64,.25);opacity:.96}
+body.is-dragging,body.is-dragging *{cursor:grabbing!important;user-select:none;-webkit-user-select:none}
+
+/* ---------- timeline ---------- */
+.timeline{position:relative}
+.timeline::before{content:"";position:absolute;left:19px;top:14px;bottom:14px;width:2px;background:var(--ink)}
+.slot,.cap{position:relative;display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:center;margin-bottom:12px}
+.cap{margin-bottom:14px}
+.cap:last-child{margin-bottom:0;margin-top:2px}
+.cap-dot{width:14px;height:14px;background:var(--ink);transform:rotate(45deg);justify-self:center;position:relative;z-index:1}
+.cap-text{font:600 .98rem/1.35 var(--slab);padding:8px 12px;background:var(--ink);color:#fff}
+.slot-num{position:relative;z-index:1;width:32px;height:32px;justify-self:center;background:var(--ink);color:#fff;display:grid;place-items:center;font:700 .98rem var(--slab)}
+.slot.locked .slot-num{background:var(--teal)}
+.slot.hinted .slot-num{background:var(--red);animation:pulse .8s 3}
+.slot-body{display:flex;min-height:80px;align-items:stretch}
+.slot-body .card{flex:1}
+.slot:not(.filled) .slot-body{border:2px dashed var(--rule);background:rgba(251,252,253,.45)}
+.slot-empty{margin:auto;padding:8px 12px;color:var(--ink-2);font-size:.92rem}
+.slot.hover:not(.filled) .slot-body{border-color:var(--red);background:rgba(194,59,49,.1)}
+.slot.hover .card{outline:3px dashed var(--red);outline-offset:3px}
+body.has-selection .slot:not(.filled):not(.locked) .slot-body{border-color:var(--red);background:rgba(194,59,49,.07);cursor:pointer}
+body.has-selection .slot:not(.filled):not(.locked) .slot-empty{color:var(--red);font-weight:600}
+
+/* ---------- dock ---------- */
+.dock{position:sticky;bottom:0;z-index:20;margin:20px -20px 0;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));background:var(--ink);color:#fff;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.status{margin:0;flex:1 1 320px;font-size:.98rem;line-height:1.4}
+.status.warn{color:#ffcf99}
+.status.info{color:#bfe0ff}
+.status.ok{color:#a4ecd4}
+.dock-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ---------- debrief ---------- */
+#debrief{padding:30px 0 60px}
+#debrief h1{max-width:none}
+.rank{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;margin:18px 0 8px}
+.rank-stamp{display:inline-block;padding:10px 18px;border:4px double var(--teal);color:var(--teal);font:700 1.35rem/1.1 var(--mono);letter-spacing:.04em;text-transform:uppercase;transform:rotate(-2.5deg);background:rgba(255,255,255,.6)}
+.rank p{margin:0;max-width:46ch;color:var(--ink-2)}
+.ruler-box{margin:26px 0 8px;padding:16px 16px 10px;background:rgba(251,252,253,.6);border:2px solid var(--ink)}
+.ruler-box h2{font-size:1.1rem}
+.ruler-box p{margin:4px 0 6px;font-size:.9rem;color:var(--ink-2);max-width:70ch}
+.ruler{position:relative;height:172px;margin:0 22px}
+.ruler-base{position:absolute;left:0;right:0;bottom:26px;height:3px;background:var(--ink)}
+.mk{position:absolute;bottom:26px;width:0;border-left:2px solid var(--ink)}
+.mk-dot{position:absolute;top:-13px;left:-13px;width:26px;height:26px;background:var(--ink);color:#fff;display:grid;place-items:center;font:700 .85rem var(--slab)}
+.tk{position:absolute;bottom:0;transform:translateX(-50%);font:600 .8rem/1 var(--mono);padding-top:10px}
+.tk::before{content:"";position:absolute;left:50%;top:-8px;height:10px;border-left:2px solid var(--ink)}
+.entries{margin-top:22px}
+.entry{display:grid;grid-template-columns:210px 1fr;gap:8px 24px;padding:20px 0 22px;border-top:3px solid var(--ink)}
+.entry-head{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.entry-num{width:32px;height:32px;background:var(--ink);color:#fff;display:grid;place-items:center;font:700 1rem var(--slab)}
+.entry-date{padding:3px 8px;border:2px solid var(--ink);font:700 .78rem/1.3 var(--mono);letter-spacing:.04em;text-transform:uppercase;background:rgba(255,255,255,.55)}
+.entry h3{font-size:1.35rem;line-height:1.2;margin-bottom:6px}
+.entry p{margin:.5em 0;max-width:68ch}
+.why{padding:9px 14px;background:var(--slip);border-left:5px solid var(--teal)}
+.next{color:var(--ink-2);font-style:italic}
+.entry.last-line{padding-bottom:10px}
+.talk{margin-top:26px;padding:18px 22px;background:var(--slip);border:2px solid var(--ink);box-shadow:var(--hard)}
+.talk h2{font-size:1.2rem;margin-bottom:8px}
+.talk ol{margin:0;padding-left:1.3em;max-width:70ch}
+.talk li{margin:.5em 0}
+.again{margin-top:22px}
+
+/* ---------- event popup ---------- */
+.modal{position:fixed;inset:0;z-index:2000;background:rgba(27,36,64,.68);display:flex;align-items:center;justify-content:center;padding:18px;overflow-y:auto}
+.modal-card{width:100%;max-width:580px;max-height:calc(100vh - 36px);overflow-y:auto;background:var(--slip);border:3px solid var(--ink);box-shadow:8px 8px 0 rgba(27,36,64,.35);padding:22px 24px 24px}
+.modal-kicker{margin:0 0 10px;font-weight:700;color:var(--teal)}
+.modal-top{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.modal-top .stamp{margin-top:0}
+.modal-card h2{font-size:1.5rem;line-height:1.2;margin-bottom:8px}
+.modal-card p{margin:.55em 0}
+.modal-card .why{padding:9px 14px;background:var(--teal-bg);border-left:5px solid var(--teal)}
+.modal-card .next{color:var(--ink-2);font-style:italic}
+.modal-card .btn{margin-top:14px}
+body.modal-open{overflow:hidden}
+
+/* ---------- small screens ---------- */
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr;gap:22px}
+  .bank{position:static;max-height:none}
+  .entry{grid-template-columns:1fr}
+  .entry-head{flex-direction:row;align-items:center;flex-wrap:wrap}
+}
+@media (max-width:520px){
+  .wrap{padding:0 14px}
+  .dock{margin:20px -14px 0;padding-left:14px;padding-right:14px}
+  .stats .btn{margin-left:0}
+  .ruler{margin:0 16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ GAME ============ -->
+  <main id="game">
+    <header class="masthead">
+      <h1>From empire to civil war: China, 1911–1937</h1>
+      <p class="lede">Ten turning points in modern Chinese history are out of order. Drag each event to the spot where it belongs on the timeline. <strong>Put the events in historical order.</strong> A correct placement locks the card in and opens the story of that event.</p>
+    </header>
+
+    <div class="stats" aria-label="Progress">
+      <div class="stat"><b id="stPlaced">0/10</b><span>placed</span></div>
+      <div class="stat"><b id="stLocked">0</b><span>hints used</span></div>
+      <div class="stat"><b id="stAttempts">0</b><span>misses</span></div>
+      <button id="restartBtn" class="btn" type="button">Start over</button>
+    </div>
+
+    <div class="layout">
+      <aside id="bank" class="bank" aria-label="Event cards waiting to be placed">
+        <h2 class="section-title">Events to place</h2>
+        <p class="help">Drag a card to the spot where it belongs. Or select a card, then select a spot. On a touch screen, drag by the dotted handle.</p>
+        <div id="bankList" class="bank-list"></div>
+      </aside>
+
+      <section aria-label="Timeline">
+        <h2 class="section-title">Your timeline</h2>
+        <p class="help">Earliest at the top, latest at the bottom. Select a placed card to read about it again.</p>
+        <div id="timeline" class="timeline"></div>
+      </section>
+    </div>
+
+    <div class="dock" role="group" aria-label="Game controls">
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <div class="dock-actions">
+        <button id="hintBtn" class="btn light" type="button">Hint</button>
+        <button id="revealBtn" class="btn light" type="button" hidden>Show the order</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ DEBRIEF ============ -->
+  <section id="debrief" hidden>
+    <h1 id="debriefTitle" tabindex="-1">The full timeline</h1>
+    <div class="rank" id="rank"></div>
+
+    <div class="ruler-box">
+      <h2>Where the events fall in time</h2>
+      <p>Each number matches an event below. Notice how close together the events of 1911–12 are, and the long stretches in between.</p>
+      <div class="ruler" id="ruler" aria-hidden="true"></div>
+    </div>
+
+    <div class="entries" id="entries"></div>
+
+    <div class="talk">
+      <h2>Think and discuss</h2>
+      <ol>
+        <li>Why did the new Republic fail to build a stable government after 1912? What role did Yuan Shikai’s army play?</li>
+        <li>How did the May Fourth Movement change who took part in Chinese politics, and which ideas they turned to?</li>
+        <li>Why did the alliance between the Nationalists and the Communists collapse in 1927? Was it ever likely to last?</li>
+        <li>The Long March was a retreat. Why is it remembered as a victory by the Communist Party?</li>
+      </ol>
+    </div>
+
+    <button id="againBtn" class="btn primary again" type="button">Play again</button>
+  </section>
+
+  <!-- ============ EVENT POPUP ============ -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+      <p class="modal-kicker" id="mKicker"></p>
+      <div class="modal-top"><span class="entry-num" id="mNum"></span><span class="stamp" id="mStamp"></span></div>
+      <h2 id="mTitle"></h2>
+      <p id="mSummary"></p>
+      <p class="why" id="mWhy"></p>
+      <p class="next" id="mNext"></p>
+      <button id="mClose" class="btn primary" type="button">Continue</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* =====================================================================
+   EVENT DATA
+   ---------------------------------------------------------------------
+   The correct order comes from `rank` (1 = first). To reorder, change the
+   `rank` numbers. `sort` is the real start date as a decimal year (1919.34 is
+   early May 1919); it only positions the dots on the ruler at the end.
+   `year` is what the Hint button reveals.
+   ===================================================================== */
+const EVENTS = [
+  {
+    id:'wuchang', title:'Wuchang Uprising', sort:1911.78, year:1911, rank:2,
+    date:'October 10, 1911',
+    summary:'In October 1911, a bomb went off by accident and exposed a secret plot against the Qing. Soldiers in Wuchang took over an arsenal and rebelled. Within weeks, more than a dozen provinces broke away from the Qing.',
+    why:'This started the Xinhai Revolution. Sun Yat-sen was abroad when it began.',
+    next:'Sun returned and was elected provisional president in December 1911.'
+  },
+  {
+    id:'sun', title:'Rise of Sun Yat-sen', sort:1905.6, year:1905, rank:1,
+    date:'1905 – 1911',
+    summary:'Sun Yat-sen wanted to end Qing rule and build a modern republic. In 1905 he founded the Revolutionary Alliance in Tokyo and planned uprisings from exile. His Three Principles of the People were nationalism, democracy, and people’s livelihood.',
+    why:'He became the face and voice of the revolution, but he had no large army.',
+    next:'In October 1911, a revolt began in Wuchang.'
+  },
+  {
+    id:'republic', title:'Xinhai Revolution', sort:1912.00, year:1912, rank:3,
+    date:'January 1 – February 12, 1912',
+    summary:'The Xinhai Revolution ended Qing rule in early 1912. The Republic of China was announced on January 1, 1912, with Sun Yat-sen as provisional president. On February 12, the Qing court had six-year-old Emperor Puyi give up the throne.',
+    why:'More than 2,000 years of imperial rule ended, but the new government had little money and no strong army.',
+    next:'To get the emperor to step down, the revolutionaries promised the presidency to General Yuan Shikai.'
+  },
+  {
+    id:'yuan', title:'Yuan Shikai Takes Power', sort:1912.19, year:1912, rank:4,
+    date:'March 10, 1912',
+    summary:'Yuan Shikai led the strongest army in northern China. In March 1912, Sun stepped aside and Yuan became president. Yuan then shut down parliament and tried to make himself emperor in 1915.',
+    why:'Yuan showed that the army, not the constitution, held real power. He gave up his plan in 1916 and died a few months later.',
+    next:'When Yuan died, no one could keep his army together.'
+  },
+  {
+    id:'warlord', title:'Warlord Period & First United Front', sort:1916.45, year:1916, rank:5,
+    date:'1916 – 1927',
+    summary:'After Yuan died in 1916, generals took control of different regions and fought each other. The government in Beijing was weak. In 1923–24, with Soviet help, Sun’s Nationalist Party let Communists join, forming the First United Front. Together they attacked the warlords in the Northern Expedition of 1926.',
+    why:'China was divided and too weak to stand up to foreign powers. Many people wanted a strong party to unite the country.',
+    next:'Because China was weak, other nations ignored its wishes in 1919.'
+  },
+  {
+    id:'may4', title:'May Fourth Movement', sort:1919.34, year:1919, rank:6,
+    date:'May 4, 1919',
+    summary:'China fought on the Allied side in World War I. But at the peace talks in Paris, German territory in Shandong went to Japan instead of China. On May 4, 1919, students in Beijing protested, and strikes and boycotts of Japanese goods spread.',
+    why:'The protests brought new ideas about democracy, science, and Marxism. Many young people lost trust in Western powers.',
+    next:'Some activists turned to the Russian Revolution as a model and started political groups.'
+  },
+  {
+    id:'nc', title:'Nationalists & Communists', sort:1921.55, year:1921, rank:7,
+    date:'July 1921 (CCP founded)',
+    summary:'The Chinese Communist Party formed in Shanghai in 1921. Its leaders were thinkers from the May Fourth era, and young Mao Zedong was at the first meeting. The Nationalists, led by Sun Yat-sen, wanted a strong government run by their party. The Communists wanted a social revolution led by workers and peasants.',
+    why:'These two parties would work together and fight each other for decades.',
+    next:'Their partnership was shaky, and in 1927 Nationalist leader Chiang Kai-shek struck first.'
+  },
+  {
+    id:'shanghai', title:'Shanghai Massacre', sort:1927.28, year:1927, rank:8,
+    date:'April 12, 1927',
+    summary:'In April 1927, Chiang Kai-shek’s troops and a gang called the Green Gang attacked Communists and labor unions in Shanghai. Hundreds were killed right away, and thousands more died in the crackdown that followed.',
+    why:'The First United Front ended, and the Communists lost most of their support in the cities.',
+    next:'The Communists fled to the countryside, and Chiang tried to destroy them. By 1934 his army had almost trapped them.'
+  },
+  {
+    id:'civil', title:'Start of the Chinese Civil War', sort:1927.58, year:1927, rank:10,
+    date:'August 1927 (Nanchang Uprising)',
+    summary:'After the Shanghai Massacre, the Communists and Nationalists were enemies. In August 1927, Communist officers led the Nanchang Uprising, their first big armed revolt. Mao Zedong then built rural bases and a Red Army, and Chiang Kai-shek launched campaigns to wipe them out.',
+    why:'The Communists shifted their focus from city workers to peasants. Chiang put fighting the Communists ahead of resisting Japan, even after Japan took Manchuria in 1931.',
+    next:'By 1937, Japan was pushing deeper into northern China.'
+  },
+  {
+    id:'longmarch', title:'The Long March', sort:1934.79, year:1934, rank:9,
+    date:'October 1934 – October 1935',
+    summary:'In October 1934, about 86,000 Communist soldiers escaped from their base in Jiangxi as Nationalist armies closed in. They marched about 6,000 miles over mountains, rivers, and grasslands. Only around 8,000 to 10,000 reached northern Shaanxi in 1935.',
+    why:'At the Zunyi Conference in 1935, Mao Zedong became the party’s top leader. The march became a symbol of Communist toughness.',
+    next:'The Communists rebuilt in the northwest, but their fight with the Nationalists was not over.'
+  }
+];
+
+const START_CAP = 'Before 1911: China is still an empire. The Qing dynasty has ruled since 1644.';
+const END_CAP   = 'July 1937: Japan and China go to war (the Marco Polo Bridge Incident begins the Second Sino-Japanese War).';
+
+/* ===================================================================== */
+
+const ORDER = EVENTS.slice().sort((a,b)=>a.rank-b.rank);
+const N = ORDER.length;
+const BY_ID = {};
+EVENTS.forEach(e => { BY_ID[e.id] = e; });
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const state = {
+  slots:[], locked:[], bank:[],
+  selected:null, attempts:0, hints:0, hintSlot:-1,
+  revealed:false, won:false,
+  flash:null, missId:null, modalId:null
+};
+let refocus = null;
+
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function newGame(){
+  let ids;
+  do { ids = shuffle(ORDER.map(e=>e.id)); }
+  while (ids.every((id,i)=>id===ORDER[i].id));
+  state.slots  = Array(N).fill(null);
+  state.locked = Array(N).fill(false);
+  state.bank   = ids;
+  state.selected = null; state.attempts = 0; state.hints = 0; state.hintSlot = -1;
+  state.revealed = false; state.won = false;
+  state.flash = null; state.missId = null; state.modalId = null;
+  $('#modal').hidden = true;
+  document.body.classList.remove('modal-open');
+  $('#game').hidden = false;
+  $('#debrief').hidden = true;
+  render();
+}
+
+/* clears one-shot visual state before any user action */
+function touch(){ state.flash = null; state.missId = null; }
+function flash(text, kind){ state.flash = {text:text, kind:kind||''}; }
+
+/* ---------- rendering ---------- */
+function cardHTML(id, o){
+  o = o || {};
+  const e = BY_ID[id];
+  const cls = ['card'];
+  if (o.locked) cls.push('locked');
+  if (state.selected===id) cls.push('selected');
+  if (state.missId===id) cls.push('shake');
+  const extra = o.locked ? '<span class="stamp">'+esc(e.date)+'</span>' : '';
+  const attrs = o.locked
+    ? ' tabindex="0" role="button" aria-label="Read about '+esc(e.title)+' again"'
+    : ' tabindex="0" role="button" aria-pressed="'+(state.selected===id)+'"';
+  return '<div class="'+cls.join(' ')+'" data-id="'+id+'"'+attrs+'>'
+    + (o.locked ? '<div class="tick" aria-hidden="true">✓</div>' : '<div class="grip" aria-hidden="true"></div>')
+    + '<div class="cbody"><div class="ctitle">'+esc(e.title)+'</div>'+extra+'</div></div>';
+}
+
+function slotHTML(i){
+  const id = state.slots[i], locked = state.locked[i];
+  const cls = ['slot'];
+  if (id) cls.push('filled');
+  if (locked) cls.push('locked');
+  if (state.hintSlot===i) cls.push('hinted');
+  const attrs = locked ? '' : ' tabindex="0" role="button" aria-label="Timeline position '+(i+1)+', empty. Press Enter to place the selected event here."';
+  return '<div class="slot'+cls.slice(1).map(c=>' '+c).join('')+'" data-i="'+i+'"'+attrs+'>'
+    + '<div class="slot-num" aria-hidden="true">'+(i+1)+'</div>'
+    + '<div class="slot-body">'
+    + (id ? cardHTML(id,{locked:true}) : '<span class="slot-empty">Drop an event here</span>')
+    + '</div></div>';
+}
+
+function idleMessage(){
+  if (state.selected) return 'Selected: '+BY_ID[state.selected].title+'. Now select a spot on the timeline.';
+  const left = state.bank.length;
+  if (left===N) return 'Place all ten events, earliest at the top.';
+  return left+(left===1?' event':' events')+' left to place.';
+}
+
+function render(){
+  const lockedN = state.locked.filter(Boolean).length;
+  $('#stPlaced').textContent = lockedN+'/'+N;
+  $('#stLocked').textContent = state.hints;
+  $('#stAttempts').textContent = state.attempts;
+
+  $('#bankList').innerHTML = state.bank.length
+    ? state.bank.map(id => cardHTML(id)).join('')
+    : '<p class="bank-empty">Every event has been placed.</p>';
+
+  let html = '<div class="cap"><span class="cap-dot"></span><div class="cap-text">'+esc(START_CAP)+'</div></div>';
+  for (let i=0;i<N;i++) html += slotHTML(i);
+  html += '<div class="cap"><span class="cap-dot"></span><div class="cap-text">'+esc(END_CAP)+'</div></div>';
+  $('#timeline').innerHTML = html;
+
+  document.body.classList.toggle('has-selection', !!state.selected);
+
+  const st = $('#status');
+  if (state.flash){ st.textContent = state.flash.text; st.className = 'status '+state.flash.kind; }
+  else { st.textContent = idleMessage(); st.className = 'status'; }
+
+  $('#hintBtn').disabled = state.won;
+  $('#revealBtn').hidden = !(state.attempts >= 5 && !state.won);
+
+  if (refocus){
+    const el = document.querySelector('.card[data-id="'+refocus.id+'"]');
+    if (el) el.focus({preventScroll:true});
+    refocus = null;
+  }
+}
+
+/* ---------- placing a card ---------- */
+function tryPlace(id, i, kb){
+  touch();
+  if (state.locked[i]){
+    flash('That spot is already filled. Choose another one.','warn');
+    render();
+    return;
+  }
+  const correct = ORDER.findIndex(e=>e.id===id);
+  state.selected = null;
+  if (correct===i){
+    state.slots[i] = id;
+    state.locked[i] = true;
+    state.bank.splice(state.bank.indexOf(id),1);
+    state.hintSlot = -1;
+    flash('Correct: '+BY_ID[id].title+' is position '+(i+1)+'.','ok');
+    render();
+    openModal(id, true);
+  } else {
+    state.attempts++;
+    state.missId = id;
+    flash('Not position '+(i+1)+'. That event happened '+(correct<i ? 'earlier' : 'later')+' than this spot. Try another one.','warn');
+    if (kb) refocus = {id:id};
+    render();
+  }
+}
+
+/* ---------- the event popup ---------- */
+function openModal(id, isNew){
+  const e = BY_ID[id], i = ORDER.indexOf(e);
+  state.modalId = id;
+  $('#mKicker').textContent = isNew ? 'Correct! This is event '+(i+1)+' of '+N+'.' : 'Event '+(i+1)+' of '+N;
+  $('#mNum').textContent = i+1;
+  const stamp = $('#mStamp');
+  stamp.textContent = e.date;
+  stamp.classList.remove('fresh');
+  if (isNew && !reduceMotion){ void stamp.offsetWidth; stamp.classList.add('fresh'); }
+  $('#mTitle').textContent = e.title;
+  $('#mSummary').textContent = e.summary;
+  $('#mWhy').innerHTML = '<strong>Why it matters:</strong> '+esc(e.why);
+  $('#mNext').textContent = 'Next: '+e.next;
+  const lastOne = state.locked.every(Boolean);
+  $('#mClose').textContent = (isNew && lastOne) ? 'See the full timeline' : 'Continue';
+  $('#modal').hidden = false;
+  document.body.classList.add('modal-open');
+  $('.modal-card').scrollTop = 0;
+  $('#mClose').focus({preventScroll:true});
+}
+
+function closeModal(){
+  if (!state.modalId) return;
+  state.modalId = null;
+  $('#modal').hidden = true;
+  document.body.classList.remove('modal-open');
+  if (state.locked.every(Boolean) && !state.won){ win(); return; }
+  render();
+  const f = document.querySelector('#bankList .card');
+  if (f) f.focus({preventScroll:true});
+}
+
+/* ---------- hint, reveal, finish ---------- */
+function hint(){
+  if (state.won || state.modalId) return;
+  const i = state.locked.findIndex(l=>!l);
+  if (i<0) return;
+  touch();
+  state.hints++;
+  state.selected = null;
+  state.hintSlot = i;
+  flash('Hint: the event that belongs in position '+(i+1)+' begins in '+ORDER[i].year+'.','info');
+  render();
+  const el = document.querySelector('.slot[data-i="'+i+'"]');
+  if (el) el.scrollIntoView({block:'center', behavior: reduceMotion ? 'auto' : 'smooth'});
+}
+
+function reveal(){
+  touch();
+  state.revealed = true;
+  state.slots = ORDER.map(e=>e.id);
+  state.bank = [];
+  state.locked.fill(true);
+  win();
+}
+
+function win(){
+  state.won = true;
+  state.selected = null;
+  buildDebrief();
+  $('#game').hidden = true;
+  $('#debrief').hidden = false;
+  window.scrollTo(0,0);
+  $('#debriefTitle').focus({preventScroll:true});
+}
+
+function buildDebrief(){
+  const penalty = state.attempts + state.hints;
+  const misses = state.attempts+(state.attempts===1?' miss':' misses');
+  const hints = state.hints+(state.hints===1?' hint':' hints');
+  let title, text;
+  if (state.revealed){
+    title = 'Keep studying';
+    text = 'You revealed the order. Read through the timeline below, then start over and try to rebuild it from memory.';
+  } else if (penalty===0){
+    title = 'Master historian';
+    text = 'Every event went in the right spot on the first try, with no hints.';
+  } else if (penalty<=4){
+    title = 'Senior scholar';
+    text = 'Finished with '+misses+' and '+hints+'.';
+  } else {
+    title = 'Rising historian';
+    text = 'Finished with '+misses+' and '+hints+'. Read the timeline below to see how each event led to the next.';
+  }
+  $('#rank').innerHTML = '<span class="rank-stamp">'+esc(title)+'</span><p>'+esc(text)+'</p>';
+
+  /* proportional ruler */
+  const MIN = 1905, MAX = 1937.6;
+  const pos = y => ((y-MIN)/(MAX-MIN))*100;
+  let r = '<div class="ruler-base"></div>';
+  [1905,1911,1920,1930,1937].forEach(y=>{
+    r += '<div class="tk" style="left:'+pos(y).toFixed(2)+'%">'+y+'</div>';
+  });
+  ORDER.forEach((e,i)=>{
+    const row = i%4;
+    r += '<div class="mk" style="left:'+pos(e.sort).toFixed(2)+'%;height:'+(28+row*32)+'px">'
+      + '<span class="mk-dot">'+(i+1)+'</span></div>';
+  });
+  $('#ruler').innerHTML = r;
+
+  /* detailed entries */
+  let h = '';
+  ORDER.forEach((e,i)=>{
+    h += '<article class="entry">'
+      + '<div class="entry-head"><span class="entry-num">'+(i+1)+'</span><span class="entry-date">'+esc(e.date)+'</span></div>'
+      + '<div><h3>'+esc(e.title)+'</h3>'
+      + '<p>'+esc(e.summary)+'</p>'
+      + '<p class="why"><strong>Why it matters:</strong> '+esc(e.why)+'</p>'
+      + '<p class="next">Next: '+esc(e.next)+'</p></div></article>';
+  });
+  h += '<article class="entry last-line"><div class="entry-head"><span class="entry-date">July 7, 1937</span></div>'
+    + '<div><h3>Second Sino-Japanese War begins</h3>'
+    + '<p>On July 7, 1937, fighting near Beijing’s Marco Polo Bridge grew into a full war between China and Japan. The Nationalists and Communists agreed to join forces against Japan, though they stayed rivals.</p></div></article>';
+  $('#entries').innerHTML = h;
+}
+
+/* ---------- drag and drop (pointer events: mouse, pen, touch) ---------- */
+let drag = null, suppressClick = false, scrollRAF = 0, scrollV = 0;
+
+document.addEventListener('pointerdown', e=>{
+  if (drag || state.won || state.modalId) return;
+  const card = e.target.closest('.card');
+  if (!card || card.classList.contains('locked')) return;
+  if (e.pointerType==='mouse' && e.button!==0) return;
+  /* on touch and pen, only the handle starts a drag so the page can still scroll */
+  if (e.pointerType!=='mouse' && !e.target.closest('.grip')) return;
+  const r = card.getBoundingClientRect();
+  drag = {
+    id:card.dataset.id, card:card, pid:e.pointerId,
+    x0:e.clientX, y0:e.clientY, ox:e.clientX-r.left, oy:e.clientY-r.top, w:r.width,
+    started:false, ghost:null, hover:null, lx:e.clientX, ly:e.clientY
+  };
+  try { card.setPointerCapture(e.pointerId); } catch(_){}
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+  window.addEventListener('pointercancel', onCancel);
+});
+
+function startDrag(){
+  drag.started = true;
+  const g = drag.card.cloneNode(true);
+  g.classList.remove('selected','shake');
+  g.removeAttribute('tabindex');
+  g.classList.add('ghost');
+  g.style.width = drag.w+'px';
+  document.body.appendChild(g);
+  drag.ghost = g;
+  drag.card.classList.add('dragging');
+  document.body.classList.add('is-dragging');
+}
+
+function onMove(e){
+  if (!drag || e.pointerId!==drag.pid) return;
+  if (!drag.started){
+    if (Math.hypot(e.clientX-drag.x0, e.clientY-drag.y0) < 6) return;
+    startDrag();
+  }
+  drag.lx = e.clientX; drag.ly = e.clientY;
+  drag.ghost.style.transform = 'translate('+(e.clientX-drag.ox)+'px,'+(e.clientY-drag.oy)+'px) rotate(-1.5deg)';
+  updateHover(e.clientX, e.clientY);
+  autoScroll(e.clientY);
+}
+
+function dropTarget(x,y){
+  const el = document.elementFromPoint(x,y);
+  const slot = el && el.closest('.slot');
+  return slot ? {i:+slot.dataset.i, el:slot} : null;
+}
+
+function updateHover(x,y){
+  if (!drag) return;
+  const t = dropTarget(x,y);
+  const el = (t && !state.locked[t.i]) ? t.el : null;
+  if (drag.hover && drag.hover!==el) drag.hover.classList.remove('hover');
+  if (el) el.classList.add('hover');
+  drag.hover = el;
+}
+
+function autoScroll(y){
+  const m = 80, h = window.innerHeight;
+  scrollV = y<m ? -Math.ceil((m-y)/6) : (y>h-m ? Math.ceil((y-(h-m))/6) : 0);
+  if (scrollV && !scrollRAF) scrollRAF = requestAnimationFrame(tick);
+}
+function tick(){
+  scrollRAF = 0;
+  if (!drag || !drag.started || !scrollV) return;
+  window.scrollBy(0, scrollV);
+  updateHover(drag.lx, drag.ly);
+  scrollRAF = requestAnimationFrame(tick);
+}
+
+function endDrag(){
+  if (!drag) return;
+  if (drag.ghost) drag.ghost.remove();
+  if (drag.hover) drag.hover.classList.remove('hover');
+  drag.card.classList.remove('dragging');
+  document.body.classList.remove('is-dragging');
+  window.removeEventListener('pointermove', onMove);
+  window.removeEventListener('pointerup', onUp);
+  window.removeEventListener('pointercancel', onCancel);
+  cancelAnimationFrame(scrollRAF); scrollRAF = 0; scrollV = 0;
+  drag = null;
+}
+
+function onUp(e){
+  if (!drag || e.pointerId!==drag.pid) return;
+  const d = drag;
+  const wasDrag = d.started;
+  const t = wasDrag ? dropTarget(e.clientX, e.clientY) : null;
+  endDrag();
+  if (!wasDrag) return;
+  suppressClick = true;
+  setTimeout(()=>{ suppressClick = false; }, 0);
+  if (t) tryPlace(d.id, t.i, false);
+  else { touch(); render(); }
+}
+function onCancel(){ endDrag(); render(); }
+
+/* ---------- tap / click / keyboard: select a card, then select a spot ---------- */
+document.addEventListener('click', e=>{
+  if (suppressClick || state.won || state.modalId) return;
+  const card = e.target.closest('.card');
+  const slot = e.target.closest('.slot');
+  if (!card && !slot) return;
+  const kb = e.detail===0;
+
+  if (card){
+    const id = card.dataset.id;
+    if (card.classList.contains('locked')){
+      if (state.selected) tryPlace(state.selected, +card.closest('.slot').dataset.i, kb);
+      else openModal(id, false);
+      return;
+    }
+    touch();
+    state.selected = (state.selected===id) ? null : id;
+    if (kb) refocus = {id:id};
+    render();
+    return;
+  }
+  if (state.selected) tryPlace(state.selected, +slot.dataset.i, kb);
+  else { touch(); flash('Select a card first, or drag one onto a spot.','info'); render(); }
+});
+
+document.addEventListener('keydown', e=>{
+  if (state.modalId){
+    if (e.key==='Escape'){ e.preventDefault(); closeModal(); }
+    else if (e.key==='Tab'){ e.preventDefault(); $('#mClose').focus(); }
+    return;
+  }
+  if (state.won) return;
+  if ((e.key==='Enter' || e.key===' ') && e.target.matches && e.target.matches('.card, .slot:not(.locked)')){
+    e.preventDefault();
+    e.target.click();
+  } else if (e.key==='Escape' && state.selected){
+    touch(); state.selected = null; render();
+  }
+});
+
+$('#mClose').addEventListener('click', closeModal);
+$('#modal').addEventListener('click', e=>{ if (e.target===$('#modal')) closeModal(); });
+$('#hintBtn').addEventListener('click', hint);
+$('#revealBtn').addEventListener('click', reveal);
+$('#restartBtn').addEventListener('click', ()=>{ newGame(); window.scrollTo(0,0); });
+$('#againBtn').addEventListener('click', ()=>{ newGame(); window.scrollTo(0,0); });
+
+newGame();
+})();
+</script>
+</body>
+</html>
