@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="An interactive timeline of Hitler’s rise to power and early rule, 1919 to 1936. Students identify the characteristics of fascism from Jason Stanley’s How Fascism Works at each step.">
+<meta name="description" content="An interactive timeline of Hitler’s rise to power and early rule, 1919 to 1935. Students identify the characteristics of fascism from Jason Stanley’s How Fascism Works at each step.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&amp;family=Old+Standard+TT:wght@400;700&amp;display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ textarea,input[type="text"]{width:100%;background:var(--surface);border:1px soli
   <div class="top-inner">
     <div>
       <h1>Hitler’s Rise to Power</h1>
-      <p class="sub">A timeline from 1919 to 1936. At every step, name the tools of fascism Hitler is using.</p>
+      <p class="sub">A timeline from 1919 to 1935. At every step, name the tools of fascism Hitler is using.</p>
     </div>
     <div class="top-tools">
       <div class="progress" id="progress" aria-live="polite"></div>
@@ -255,7 +255,7 @@ var CHARS = [
 var CHAR_BY_ID = {};
 CHARS.forEach(function(c){ CHAR_BY_ID[c.id] = c; });
 
-var PARTS = {1:"Part 1: The rise (1919 to Jan. 1933)", 2:"Part 2: Taking control (1933 to 1936)"};
+var PARTS = {1:"Part 1: The rise (1919 to Jan. 1933)", 2:"Part 2: Taking control (1933 to 1935)"};
 
 var EVENTS = [
 {
@@ -582,25 +582,6 @@ var EVENTS = [
     sex:"The law policed love, marriage, sex, and even household employment to protect “German honor.” This is sexual anxiety made into criminal law.",
     law:"Persecution became a legal, bureaucratic system, giving prejudice the look of order and legitimacy.",
     myth:"The idea of “pure blood” draws on the myth of an ancient, unmixed Aryan nation."
-  }
-},
-{
-  id:"rhineland", part:2, year:"1936", short:"Rhineland remilitarized", date:"March 7, 1936",
-  title:"Troops march into the Rhineland",
-  story:[
-    "Under the Versailles treaty, German troops were forbidden in the Rhineland, the region bordering France and Belgium. On March 7, 1936, Hitler sent about 22,000 soldiers into it. Many of his generals were nervous, and had orders to pull back if France responded with force. But France and Britain did nothing.",
-    "Hitler told Germans he was restoring their honor and ending an unfair treaty. In a national vote soon after, the Nazi list won about 99% approval, in an election with no free opposition and heavy pressure on voters. Many Germans, even some who disliked the Nazis, cheered."
-  ],
-  evidence:[
-    "Hitler called the Versailles treaty an insult and presented the move as taking back German land.",
-    "Radio and newsreels showed crowds greeting the soldiers with flowers.",
-    "The vote that followed was controlled by the Nazis, with no free opposition."
-  ],
-  core:["vict","myth"], also:["hier"],
-  why:{
-    vict:"Hitler said Germany had been humiliated and treated unfairly, and that he was only correcting an injustice. Aggression was described as justice and self-defense.",
-    myth:"He promised to restore Germany’s lost greatness, honor, and territory, the same promise made in 1919, finally “delivered.”",
-    hier:"Success made Hitler look like an infallible leader, and personal loyalty to the Führer grew stronger."
   }
 }
 ];
@@ -1126,7 +1107,7 @@ function buildResults(){
   wrap.appendChild(rf);
 
   var after = el("div", "after");
-  after.appendChild(el("p", null, "This timeline stops in 1936, but the story does not. In November 1938, the Nazis staged a nationwide pogrom against Jews known as Kristallnacht. In 1939 Germany invaded Poland and World War II began. Between 1941 and 1945, the Nazi regime murdered six million Jews and millions of others, including Roma, disabled people, political prisoners, and Soviet prisoners of war."));
+  after.appendChild(el("p", null, "This timeline stops in 1935, but the story does not. In November 1938, the Nazis staged a nationwide pogrom against Jews known as Kristallnacht. In 1939 Germany invaded Poland and World War II began. Between 1941 and 1945, the Nazi regime murdered six million Jews and millions of others, including Roma, disabled people, political prisoners, and Soviet prisoners of war."));
   wrap.appendChild(after);
 
   var act = el("div", "actions no-print");
