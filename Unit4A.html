@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Alliance System, 1789–1914</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #23201b;
+    --ink-soft: #56503f;
+    --parchment: #e9decb;
+    --parchment-deep: #ddcfb2;
+    --parchment-card: #f3ead9;
+    --line: #c9b98f;
+    --burgundy: #6c2c34;
+    --burgundy-deep: #501f26;
+    --brass: #96712f;
+    --forest: #3c4f3f;
+    --entente: #6c2c34;
+    --central: #3c4f3f;
+    --shadow: rgba(35, 32, 27, 0.18);
+    box-sizing: border-box;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --ink: #ece4d3;
+      --ink-soft: #c3b8a0;
+      --parchment: #1c1a16;
+      --parchment-deep: #14120f;
+      --parchment-card: #262319;
+      --line: #4a4130;
+      --shadow: rgba(0, 0, 0, 0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #ece4d3;
+    --ink-soft: #c3b8a0;
+    --parchment: #1c1a16;
+    --parchment-deep: #14120f;
+    --parchment-card: #262319;
+    --line: #4a4130;
+    --shadow: rgba(0, 0, 0, 0.5);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+  html {
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+  }
+  body {
+    background: var(--parchment);
+    background-image:
+      radial-gradient(ellipse at top left, rgba(150,113,47,0.08), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(108,44,52,0.07), transparent 55%);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, serif;
+    line-height: 1.55;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    min-height: 100%;
+  }
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 2.4rem 1.4rem 4rem;
+  }
+  h1, h2, h3 {
+    font-family: "Fraunces", "Source Serif 4", serif;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    margin: 0 0 0.4em;
+    color: var(--ink);
+  }
+  .masthead {
+    text-align: center;
+    margin-bottom: 2.2rem;
+  }
+  .masthead .kicker {
+    font-family: "Courier Prime", monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    color: var(--brass);
+  }
+  .masthead h1 {
+    font-size: clamp(2rem, 5vw, 2.9rem);
+    font-style: italic;
+    line-height: 1.1;
+    margin-top: 0.3em;
+  }
+  .masthead .dates {
+    font-family: "Courier Prime", monospace;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.06em;
+  }
+  .rule {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 1.6rem 0;
+  }
+  .rule.thick { border-top-width: 3px; border-color: var(--ink); opacity: 0.75; }
+
+  /* Nation select */
+  .nation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1rem;
+    margin-top: 1.6rem;
+  }
+  .nation-card {
+    background: var(--parchment-card);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 1.3rem 1.2rem;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    display: flex;
+    gap: 0.9rem;
+    align-items: center;
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+  .nation-card:hover, .nation-card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px var(--shadow);
+    border-color: var(--brass);
+    outline: none;
+  }
+  .seal {
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--parchment-card);
+    background: var(--burgundy);
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.18), 0 2px 4px var(--shadow);
+  }
+  .nation-card .name {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 1.14rem;
+  }
+  .nation-card .sub {
+    font-size: 0.86rem;
+    color: var(--ink-soft);
+    margin-top: 0.15rem;
+  }
+  .mod-card {
+    margin-top: 1.6rem;
+    background: transparent;
+    border: 1px dashed var(--brass);
+  }
+  .mod-card .seal { background: var(--brass); }
+
+  /* Buttons */
+  button {
+    font-family: "Courier Prime", monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    background: var(--ink);
+    color: var(--parchment);
+    border: none;
+    padding: 0.65rem 1.1rem;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  button.secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  button.wide { width: 100%; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1.2rem; }
+
+  /* Dashboard */
+  .dossier-head {
+    display: flex; align-items: center; gap: 1rem; margin-bottom: 0.4rem;
+  }
+  .dossier-head .seal { width: 64px; height: 64px; font-size: 1.3rem; }
+  .stamp {
+    display: inline-block;
+    font-family: "Courier Prime", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--brass);
+    border: 1px solid var(--brass);
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    margin-bottom: 0.5rem;
+  }
+  .panel {
+    background: var(--parchment-card);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 1.3rem 1.4rem;
+    margin-bottom: 1.1rem;
+  }
+  .panel h3 {
+    font-size: 1rem;
+    font-family: "Courier Prime", monospace;
+    letter-spacing: 0.06em;
+    color: var(--brass);
+    text-transform: uppercase;
+  }
+  .panel ul { margin: 0.4em 0 0; padding-left: 1.2em; }
+  .panel li { margin-bottom: 0.45em; }
+  textarea {
+    width: 100%;
+    min-height: 130px;
+    font-family: "Source Serif 4", serif;
+    font-size: 0.98rem;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 0.7rem;
+    color: var(--ink);
+    resize: vertical;
+  }
+  .save-note { font-size: 0.78rem; color: var(--ink-soft); margin-top: 0.35rem; }
+
+  /* Moderator */
+  .timeline {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.4rem;
+    padding-bottom: 0.6rem;
+    margin-bottom: 1.4rem;
+  }
+  .timeline::-webkit-scrollbar { height: 5px; }
+  .tstep {
+    flex: 0 0 auto;
+    font-family: "Courier Prime", monospace;
+    font-size: 0.76rem;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .tstep.active { background: var(--ink); color: var(--parchment); border-color: var(--ink); }
+  .tstep.done { border-color: var(--brass); color: var(--brass); }
+
+  .round-year {
+    font-family: "Courier Prime", monospace;
+    color: var(--brass);
+    letter-spacing: 0.08em;
+    font-size: 0.85rem;
+  }
+  .round-title { font-size: 1.6rem; }
+
+  .picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0.9rem 0 0.4rem;
+  }
+  .chip {
+    font-family: "Courier Prime", monospace;
+    font-size: 0.82rem;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 0.4rem 0.85rem;
+    cursor: pointer;
+    background: transparent;
+    color: var(--ink);
+    user-select: none;
+  }
+  .chip.selected {
+    background: var(--burgundy);
+    border-color: var(--burgundy);
+    color: var(--parchment-card);
+  }
+  .outcome {
+    margin-top: 1.2rem;
+    padding: 1.1rem 1.3rem;
+    border-left: 3px solid var(--brass);
+    background: var(--parchment-deep);
+    font-style: italic;
+  }
+  .outcome .label {
+    display: block;
+    font-family: "Courier Prime", monospace;
+    font-style: normal;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--brass);
+    margin-bottom: 0.4em;
+  }
+
+  svg text { font-family: "Courier Prime", monospace; }
+  .graph-wrap {
+    background: var(--parchment-card);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  .legend { display: flex; gap: 1.2rem; font-size: 0.8rem; color: var(--ink-soft); margin-top: 0.6rem; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .swatch { width: 14px; height: 3px; display: inline-block; }
+
+  .final-blocs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+  @media (max-width: 620px) { .final-blocs { grid-template-columns: 1fr; } }
+  .bloc-box { border: 1px solid var(--line); border-radius: 3px; padding: 1rem 1.2rem; }
+  .bloc-box h4 { font-family: "Fraunces", serif; margin: 0 0 0.3em; font-size: 1.05rem; }
+  .bloc-box.entente { border-left: 4px solid var(--entente); }
+  .bloc-box.central { border-left: 4px solid var(--central); }
+
+  .req-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 0.6rem;
+    padding: 0.6rem 0; border-bottom: 1px solid var(--line); flex-wrap: wrap;
+  }
+  .req-row:last-child { border-bottom: none; }
+  .req-name { font-family: "Fraunces", serif; font-weight: 600; }
+  .req-status { font-size: 0.8rem; color: var(--ink-soft); font-family: "Courier Prime", monospace; }
+  .badge-allied {
+    font-family: "Courier Prime", monospace; font-size: 0.72rem; letter-spacing: 0.08em;
+    color: var(--brass); border: 1px solid var(--brass); padding: 0.15rem 0.5rem; border-radius: 2px;
+  }
+  .badge-war {
+    font-family: "Courier Prime", monospace; font-size: 0.72rem; letter-spacing: 0.08em;
+    color: var(--burgundy); border: 1px solid var(--burgundy); padding: 0.15rem 0.5rem; border-radius: 2px;
+  }
+  .elsewhere-list { margin: 0.4em 0 0; padding-left: 1.1em; font-size: 0.88rem; color: var(--ink-soft); }
+  .elsewhere-list li { margin-bottom: 0.3em; }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem; }
+  .topbar .who { font-family: "Courier Prime", monospace; font-size: 0.8rem; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var NATIONS = {
+    britain: {
+      id: "britain", code: "GB", name: "Great Britain",
+      tagline: "Mistress of the seas, keeper of the balance",
+      goals: [
+        "Preserve the balance of power in Europe — prevent any single nation from dominating the continent",
+        "Protect naval supremacy and control of key sea lanes to the Empire",
+        "Avoid binding continental alliances — the long tradition of \u201csplendid isolation\u201d",
+        "After 1898, contain Germany's growing navy and colonial ambition"
+      ],
+      resources: ["The world's largest navy", "Vast colonial empire and trade wealth", "Deep financial and industrial reserves"]
+    },
+    france: {
+      id: "france", code: "FR", name: "France",
+      tagline: "Humbled in 1871, waiting to settle the score",
+      goals: [
+        "Recover Alsace-Lorraine, lost to Germany in the war of 1870\u201371",
+        "End the diplomatic isolation imposed on France after that defeat",
+        "Build alliances capable of encircling and containing Germany",
+        "Expand and defend colonial holdings in Africa and Asia"
+      ],
+      resources: ["A large standing army", "A growing industrial base", "An expanding African colonial empire"]
+    },
+    russia: {
+      id: "russia", code: "RU", name: "Russia",
+      tagline: "Protector of the Slavs, seeker of warm water",
+      goals: [
+        "Champion Pan-Slavism and protect Slavic peoples in the Balkans, especially Serbia",
+        "Gain reliable access through the Turkish Straits (the Bosphorus and Dardanelles)",
+        "Expand influence in the Balkans at the expense of Austria-Hungary and the Ottomans",
+        "Recover great-power prestige after recent military and diplomatic setbacks"
+      ],
+      resources: ["Europe's largest population and army", "Vast but underdeveloped territory", "An industrial base far behind Britain and Germany"]
+    },
+    austria: {
+      id: "austria", code: "A-H", name: "Austria-Hungary",
+      tagline: "A patchwork empire, watching its edges fray",
+      goals: [
+        "Hold together a multi-ethnic empire against rising nationalist movements",
+        "Block Serbian and Russian influence from spreading in the Balkans",
+        "Maintain a dependable alliance with Germany for military security",
+        "Prevent the loss of Bosnia and other South Slav territories"
+      ],
+      resources: ["A sizable but ethnically fractured army", "A significant Central European industrial base", "Long-standing ties to Germany"],
+      eraNote: "Before the 1867 compromise, you represent the Austrian Empire \u2014 Austria-Hungary's precursor state."
+    },
+    germany: {
+      id: "germany", code: "DE", name: "Germany",
+      tagline: "Young, powerful, and surrounded",
+      goals: [
+        "Secure Germany's standing as a great power after unification in 1871",
+        "Avoid a two-front war against France and Russia at once",
+        "Support Austria-Hungary as Germany's most dependable ally",
+        "Build a navy to rival Britain's and claim overseas colonies — \u201ca place in the sun\u201d"
+      ],
+      resources: ["Continental Europe's most powerful army", "Fast-growing industrial and steel output", "A navy expanding rapidly after 1898"],
+      eraNote: "Before unification in 1871, you represent the Kingdom of Prussia, Germany's precursor state."
+    },
+    ottoman: {
+      id: "ottoman", code: "OE", name: "Ottoman Empire",
+      tagline: "The \u201cSick Man of Europe,\u201d searching for a patron",
+      goals: [
+        "Preserve what remains of Ottoman territory against revolt and great-power pressure",
+        "Resist Russian expansion toward the Straits and into the Balkans",
+        "Modernize the military and economy to escape dependence on European creditors",
+        "Secure a reliable great-power patron to guarantee Ottoman survival"
+      ],
+      resources: ["Strategic control of the Bosphorus and Dardanelles", "A large but underfunded army", "Heavy foreign debt and weakening central authority"]
+    }
+  };
+  var ORDER = ["britain","france","russia","austria","germany","ottoman"];
+
+  var ROUNDS = [
+    { year: "Late 1700s", title: "Revolution and the First Coalitions",
+      context: "In 1789, revolution engulfs France and the execution of the king shocks Europe's monarchies. Fearing revolutionary ideas will spread across their own borders, the great powers move to contain France by force. A few years later, France's most brilliant general, Napoleon Bonaparte, invades Ottoman Egypt \u2014 pulling the Ottoman Empire into the wars as well. (Note: in this era, Germany plays as the Kingdom of Prussia, and Austria-Hungary plays as the Austrian Empire.)",
+      prompt: "Which nations join together to fight Revolutionary France this round?",
+      outcome: "Austria and Prussia formed the First Coalition against Revolutionary France in 1792, soon joined by Britain and, later, Russia. When a young general named Napoleon invaded Ottoman Egypt in 1798, the Ottoman Empire allied with Britain and Russia against France too \u2014 nearly every power in the room ended up ranged against one revolutionary state.",
+      perspectives: {
+        britain: {
+          title: "Contesting the Revolution and the Seas",
+          context: "Revolutionary France's radicalism unsettles Britain's constitutional order, and war breaks out in 1793 as French armies threaten the Low Countries and vital trade routes. Britain's real strength lies at sea, not on the continent.",
+          prompt: "Does Britain commit fully to a continental coalition against France, or focus on naval power and colonial trade while others do the fighting on land?",
+          outcome: "Britain joined the First Coalition in 1793 and used its navy to blockade France and seize French colonies, while funding continental allies rather than committing large land armies of its own. When Napoleon invaded Ottoman Egypt in 1798 to threaten Britain's route to India, the Royal Navy under Nelson destroyed the French fleet at the Battle of the Nile, stranding Napoleon's army and pulling Britain into alliance with the Ottomans and Russia."
+        },
+        france: {
+          title: "The Revolution Under Siege",
+          context: "France has overthrown its king and declared a republic, and the crowned heads of Europe see this as a threat to be crushed before it spreads. A young artillery officer named Napoleon Bonaparte is beginning to make a name for himself.",
+          prompt: "As the great powers form a coalition against Revolutionary France, who does France try to divide, weaken, or draw into separate peace \u2014 and where does Napoleon strike next?",
+          outcome: "France defeated the First Coalition's armies on land and forced Prussia and Spain into separate peace by 1795, leaving Austria and Britain to fight on alone for a time. Napoleon's star rose fast \u2014 his brilliant Italian campaign was followed by a bold but ultimately disastrous invasion of Ottoman Egypt in 1798, meant to strike at British trade with India, which instead stranded his army after Nelson destroyed the French fleet at the Nile."
+        },
+        russia: {
+          title: "Catherine's Empire Looks West",
+          context: "Russia under Catherine the Great is expanding aggressively, partitioning Poland alongside Austria and Prussia even as revolutionary chaos convulses France. Catherine views the French Revolution with horror but is equally focused on carving up her weaker neighbors.",
+          prompt: "Does Russia commit seriously to the coalition against Revolutionary France, or treat Poland \u2014 not Paris \u2014 as the real prize of this era?",
+          outcome: "Russia joined the coalition against France more in rhetoric than in major military commitment, focusing its real energy on partitioning Poland out of existence alongside Austria and Prussia by 1795. Russia's full weight would not be thrown against France until later campaigns, after Catherine's death and the rise of Napoleon made the French threat impossible to ignore."
+        },
+        austria: {
+          title: "The Habsburgs Face Revolution on Two Fronts",
+          context: "Austria's Habsburg monarchy is alarmed by the revolution next door in France \u2014 the queen of France is an Austrian archduchess \u2014 but Vienna is also busy partitioning Poland alongside Russia and Prussia.",
+          prompt: "Does Austria lead the fight against Revolutionary France, or split its attention \u2014 and its army \u2014 with the partition of Poland?",
+          outcome: "Austria helped lead the First Coalition against France but suffered serious defeats to Napoleon's armies in Italy, while simultaneously carving up Poland alongside Russia and Prussia. Fighting a war on two strategic fronts \u2014 revolutionary France and the scramble for Polish territory \u2014 stretched Habsburg resources thin and foreshadowed the difficulty of managing multiple crises at once."
+        },
+        germany: {
+          title: "Prussia Weighs Its Priorities",
+          context: "Prussia joins the First Coalition against Revolutionary France, but Polish territory \u2014 ripe for the taking alongside Russia and Austria \u2014 may be the more tempting prize than a costly war in the west.",
+          prompt: "Does Prussia stay committed to the coalition against France, or cut a separate peace to focus on partitioning Poland instead?",
+          outcome: "Prussia broke from the coalition and signed the Treaty of Basel with France in 1795, making a separate peace so it could focus on partitioning Poland alongside Austria and Russia. The decision won Prussia territory but left it diplomatically isolated from the ongoing fight against France \u2014 a choice that would look shortsighted once Napoleon's power grew."
+        },
+        ottoman: {
+          title: "Napoleon's Uninvited Invasion",
+          context: "The Ottoman Empire has stayed out of the wars convulsing Christian Europe over the French Revolution \u2014 until General Napoleon Bonaparte invades Ottoman Egypt in 1798, seizing an empire province without warning or declaration.",
+          prompt: "How does the Ottoman Empire respond to an unprovoked French invasion of its own territory \u2014 and who might help drive the French out?",
+          outcome: "The Ottoman Empire allied with Britain and Russia \u2014 two traditional rivals \u2014 against the common threat of French-occupied Egypt. The Royal Navy's destruction of the French fleet at the Battle of the Nile in 1798 stranded Napoleon's army, and the joint Ottoman-British-Russian campaign eventually forced a French withdrawal from Egypt by 1801, restoring nominal Ottoman control."
+        }
+      }
+    },
+    { year: "1800\u20131815", title: "The Napoleonic Wars",
+      context: "Napoleon crowns himself Emperor and turns Revolutionary France into an empire that dominates the continent, crushing Austrian, Prussian, and Russian armies in campaign after campaign and redrawing the map of Europe to suit himself.",
+      prompt: "Who forms coalitions against Napoleon this round, and who is instead forced into uneasy alliance with France?",
+      outcome: "Over these fifteen years Napoleon defeated Austria, Prussia, and Russia repeatedly, at times forcing them into uneasy alliance with France, as at Tilsit in 1807. Britain, protected by its navy, was the one power he could never conquer, and it eventually led a coalition \u2014 with Prussia, Austria, and Russia \u2014 that defeated him for good at Waterloo in 1815. The Ottoman Empire, absorbed in internal revolt and a long war with Russia, stayed largely outside the main coalitions.",
+      perspectives: {
+        britain: {
+          title: "Ruling the Waves While Napoleon Rules the Land",
+          context: "Napoleon now dominates continental Europe, but Britain's navy makes it untouchable at sea. Admiral Nelson's fleet stands between Napoleon and any invasion of the British Isles, while British gold funds one coalition after another.",
+          prompt: "Does Britain keep bankrolling continental allies from behind its naval shield, or commit its own army to the fight on the continent?",
+          outcome: "Nelson's decisive victory at Trafalgar in 1805 shattered French naval power for good and secured Britain from invasion. Britain then fought a grinding land campaign in Spain and Portugal under Wellington (the Peninsular War) while funding coalition after coalition against Napoleon, finally joining Prussia, Austria, and Russia to defeat him decisively at Waterloo in 1815."
+        },
+        france: {
+          title: "An Empire at Its Height \u2014 and Its Breaking Point",
+          context: "Napoleon has crowned himself Emperor and dominates the continent, but Britain remains defiant at sea and an economic blockade meant to strangle British trade is straining France's own allies and satellite states.",
+          prompt: "Does Napoleon's France consolidate its continental empire and hold what it has \u2014 or overreach with a new invasion that could prove disastrous?",
+          outcome: "Napoleon's invasion of Russia in 1812 proved catastrophic \u2014 he captured an abandoned, burning Moscow but was forced into a brutal winter retreat that destroyed his Grand Army. The disaster emboldened his enemies, and after further defeats Napoleon abdicated in 1814, briefly returned to power in 1815, and was finally and permanently defeated at Waterloo."
+        },
+        russia: {
+          title: "From Tilsit to Napoleon's Ruin",
+          context: "Russia has fought Napoleon to a standstill and back, first suffering crushing defeats and then, after the humiliating Treaty of Tilsit in 1807, becoming an uneasy ally of France \u2014 forced into an economic blockade against its own trading partner, Britain.",
+          prompt: "Does Russia honor its uneasy alliance with Napoleon, or break from Tilsit and turn against France?",
+          outcome: "Russia's alliance with Napoleon collapsed as the economic blockade strangled Russian trade, and in 1812 Napoleon invaded with a massive army. Russia's scorched-earth retreat and the brutal winter destroyed the French Grand Army outside Moscow, and Russian troops then led the pursuit all the way to Paris, playing the decisive role in Napoleon's final defeat."
+        },
+        austria: {
+          title: "Bent but Not Broken",
+          context: "Austria has been defeated by Napoleon twice \u2014 at Austerlitz in 1805 and Wagram in 1809 \u2014 and has even married a Habsburg archduchess to the French emperor to buy peace. Foreign Minister Metternich is playing a patient, cautious game.",
+          prompt: "Does Austria stay quietly bound to its uneasy peace with Napoleon, or watch for the moment to turn against him alongside the other powers?",
+          outcome: "Austria's marriage alliance bought only a few years of peace. As Napoleon's power crumbled after the disastrous invasion of Russia, Austria rejoined the coalition against France, and Metternich's patient diplomacy helped assemble the alliance \u2014 with Britain, Prussia, and Russia \u2014 that finally defeated Napoleon at Leipzig in 1813 and Waterloo in 1815."
+        },
+        germany: {
+          title: "From Humiliation to the War of Liberation",
+          context: "Prussia's army, still organized along old-fashioned lines, is catastrophically defeated by Napoleon at Jena and Auerstedt in 1806. Occupied and humiliated, Prussian reformers begin rebuilding the state and army from the ground up.",
+          prompt: "Does Prussia accept its diminished status under French domination, or use these years to rebuild in secret for a war of liberation?",
+          outcome: "Prussian reformers overhauled the army, abolished serfdom, and modernized the state administration in the years after Jena. When Napoleon's Grand Army was destroyed in Russia in 1812, a rebuilt Prussia joined the \u201cWar of Liberation,\u201d fighting alongside Austria, Russia, and Britain to defeat Napoleon at Leipzig in 1813 and finally at Waterloo in 1815."
+        },
+        ottoman: {
+          title: "Reform, Revolt, and a Sultan's Fall",
+          context: "While the rest of Europe is consumed by Napoleon's wars, the gravest threats to the Ottoman Empire are inside its own borders. Sultan Selim III's new \u201cNizam-i Cedid\u201d army threatens the powerful Janissary corps, Serbia has risen in open revolt, and ambitious provincial governors test how far Istanbul\u2019s authority still reaches.",
+          prompt: "How does the Ottoman Empire respond to crisis at home \u2014 and does it look abroad for help against Russia, the Serbian rebels, or its own rebellious troops?",
+          outcome: "In 1807, the Janissaries revolted and deposed Selim III, who was murdered the following year. A brief countercoup installed Sultan Mahmud II, who would spend his reign trying to modernize the empire by force. Meanwhile the First Serbian Uprising (1804\u201313) won Serbia real autonomy before Ottoman forces reasserted control, and a war with Russia (1806\u201312) cost the empire the region of Bessarabia at the Treaty of Bucharest. The empire survived the era, but badly weakened and now visibly vulnerable."
+        }
+      }
+    },
+    { year: "1816\u20131849", title: "The Concert of Europe",
+      context: "After Napoleon's defeat, the great powers rebuild a conservative order at the Congress of Vienna, determined that revolution should never spread again. Russia, Austria, and Prussia consider binding themselves together to defend monarchy itself. Decades later, a Greek revolt against Ottoman rule tests whether the other great powers will intervene.",
+      prompt: "Who joins together to defend the conservative order? And when Greece revolts against the Ottomans, who intervenes \u2014 and on which side?",
+      outcome: "Russia, Austria, and Prussia formed the Holy Alliance in 1815, pledging to uphold monarchy and suppress revolution wherever it appeared; Britain refused to join. When Greeks rebelled against Ottoman rule, Britain, France, and Russia intervened against the Ottoman Empire, destroying the Ottoman-Egyptian fleet at Navarino in 1827 and helping secure Greek independence. Revolutions swept much of Europe again in 1830 and 1848, shaking the conservative order without toppling it.",
+      perspectives: {
+        britain: {
+          title: "The Outsider in Europe's Conservative Club",
+          context: "Russia, Austria, and Prussia bind themselves into a Holy Alliance to defend monarchy and suppress revolution across Europe. Britain, with its own parliamentary tradition, wants no part of it \u2014 but a Greek revolt against Ottoman rule raises the question of when Britain should intervene.",
+          prompt: "Does Britain stay aloof from the continent's conservative alliance system, and how does it respond when Greece rises against the Ottomans?",
+          outcome: "Britain refused to join the Holy Alliance, preferring to act as an independent balancer of European power. When Greece revolted against Ottoman rule, Britain joined France and Russia in intervening on the Greek side, destroying the Ottoman-Egyptian fleet at Navarino in 1827 and helping secure Greek independence \u2014 a rare moment of active continental intervention."
+        },
+        france: {
+          title: "From Restored Monarchy to Revolution \u2014 Twice",
+          context: "The Bourbon monarchy has been restored in France after Napoleon's fall, but the settlement is fragile. Reactionary policies stir unrest, and a Greek revolt against Ottoman rule offers a chance for France to act on the world stage again.",
+          prompt: "Does France's restored monarchy hold, and how far does France go in supporting the Greek revolt against the Ottomans?",
+          outcome: "France joined Britain and Russia in the intervention that helped win Greek independence, sending its own fleet to the Battle of Navarino in 1827. At home, though, the restored monarchy proved unstable: the July Revolution of 1830 overthrew Charles X, and by 1848 a second revolution toppled the monarchy entirely, establishing the Second Republic and eventually elevating Louis-Napoleon Bonaparte to power."
+        },
+        russia: {
+          title: "Gendarme of Europe",
+          context: "Russia leads the conservative Holy Alliance, committed to crushing revolution wherever it appears. Russia also has its own ambitions in the Balkans, where a Greek revolt against Ottoman rule offers a chance to weaken a longtime rival while posing as a liberator.",
+          prompt: "Does Russia use its position to intervene in the Balkans against the Ottomans, and how does it respond when revolutions break out closer to home and among its neighbors?",
+          outcome: "Russia fought its own war against the Ottomans (1828\u201329) in support of Greek independence, extending Russian influence in the Balkans. At home and among its neighbors, Russia lived up to its reputation as \u201cgendarme of Europe,\u201d crushing a Polish uprising in 1830\u201331 and later sending troops to help Austria crush the Hungarian revolution of 1849."
+        },
+        austria: {
+          title: "Metternich's System Under Strain",
+          context: "Foreign Minister Metternich has built a conservative system meant to freeze Europe in place and prevent revolution. But Austria's own multi-ethnic empire \u2014 Germans, Hungarians, Italians, Slavs \u2014 is exactly the kind of place nationalist revolution could tear apart.",
+          prompt: "Can Austria hold its conservative system together as revolution spreads across Europe in 1848 \u2014 and who does it turn to for help if its own empire starts to fracture?",
+          outcome: "Revolution engulfed Austria in 1848: Vienna itself rose up, Hungary under Kossuth declared independence, and unrest spread through Austria's Italian territories. Metternich was forced to resign and flee. Austria only survived by asking Russia for military help, which crushed the Hungarian revolution in 1849 \u2014 saving the empire, but at the cost of looking dependent on its powerful neighbor."
+        },
+        germany: {
+          title: "A German Nation, Offered and Refused",
+          context: "The German-speaking lands remain a loose confederation of states, not a unified nation. When revolution sweeps Europe in 1848, German liberals convene in Frankfurt to draft a constitution and unify Germany under a single crown.",
+          prompt: "Does Prussia accept the German nationalists' offer of leadership over a unified Germany \u2014 or does the old order hold?",
+          outcome: "The Frankfurt Parliament offered the imperial crown of a unified Germany to Prussia's King Frederick William IV in 1849. He refused it, unwilling to accept a crown \u201cfrom the gutter\u201d offered by revolutionaries rather than by fellow monarchs. The revolution collapsed, but the dream of German unification \u2014 now understood to require Prussian power, not liberal idealism \u2014 did not disappear."
+        },
+        ottoman: {
+          title: "Losing Greece, Reforming at Home",
+          context: "Greek subjects rise in revolt against Ottoman rule in 1821, drawing sympathy and eventually intervention from Christian Europe. At the same time, Sultan Mahmud II is determined to break the power of the unruly Janissary corps that deposed his predecessor.",
+          prompt: "Can the Ottoman Empire hold onto Greece against a revolt backed by the great powers \u2014 and how far does Mahmud II go to modernize the empire's military at home?",
+          outcome: "Britain, France, and Russia intervened against the Ottomans at the Battle of Navarino in 1827, destroying the Ottoman-Egyptian fleet and helping secure Greek independence \u2014 the empire's first major loss of Christian territory. At home, Mahmud II violently abolished the Janissary corps in 1826 (remembered as the \u201cAuspicious Incident\u201d), clearing the way for a modernized army, but the empire's territorial and financial decline continued."
+        }
+      }
+    },
+    { year: "1850\u20131870", title: "Crimea and the Wars of Unification",
+      context: "Russia's push into Ottoman territory triggers the Crimean War, drawing other powers to the Ottomans' defense. In the same period, a rising Prussia fights two wars that will forge a unified German Empire \u2014 first against Austria, then against France.",
+      prompt: "Who backs the Ottoman Empire against Russia? And when Prussia goes to war with Austria, then with France, who intervenes \u2014 or stays out?",
+      outcome: "Britain and France fought alongside the Ottoman Empire against Russia in the Crimean War (1853\u201356), ending in a costly Russian defeat. Austria's refusal to support Russia during that war poisoned Austro-Russian relations for a generation. Prussia, under Bismarck, then defeated Austria in 1866 and France in 1870\u201371, unifying Germany as a new great power and leaving France stripped of Alsace-Lorraine and burning for revenge.",
+      perspectives: {
+        britain: {
+          title: "Checking Russia, Watching Germany Rise",
+          context: "Russia's push into Ottoman territory threatens British interests in the Mediterranean and the route to India, drawing Britain into a costly war far from home. Meanwhile, a new power is rising in Central Europe as Prussia goes to war twice in the span of a few years.",
+          prompt: "How committed is Britain to defending the Ottoman Empire against Russia \u2014 and does Britain intervene as Prussia reshapes the balance of power in Germany?",
+          outcome: "Britain fought alongside France in the Crimean War (1853\u201356) to check Russian expansion, though the campaign exposed serious flaws in British military organization. Britain stayed on the sidelines as Prussia defeated Austria in 1866 and France in 1870\u201371, watching with growing unease as a powerful, unified German Empire emerged on the continent."
+        },
+        france: {
+          title: "Napoleon III's Gamble",
+          context: "Napoleon III, nephew of the first Napoleon, rules France and is eager to restore French prestige on the world stage. A war against Russia over Ottoman territory offers one chance to shine \u2014 but a rising Prussia under Bismarck poses a far more dangerous long-term threat.",
+          prompt: "Does France's war in Crimea restore its great-power standing \u2014 and can Napoleon III avoid being drawn into a ruinous war with Prussia?",
+          outcome: "France's campaign in the Crimean War (1853\u201356) alongside Britain helped restore French prestige and ended in Russian defeat. But Napoleon III badly misjudged Prussia: provoked by Bismarck's manipulated \u201cEms Dispatch,\u201d France declared war in 1870 and was catastrophically defeated, with Napoleon III captured at Sedan. The Second Empire collapsed, and France lost Alsace-Lorraine to the newly proclaimed German Empire."
+        },
+        russia: {
+          title: "Humiliation and Betrayal",
+          context: "Russia's push against Ottoman territory triggers a war against Britain, France, and the Ottomans that Russia is not prepared to win. Austria, bound to Russia by decades of conservative solidarity, has a choice to make.",
+          prompt: "Can Russia hold its own in the Crimean War \u2014 and does Austria, its old partner in the Holy Alliance, stand with Russia or against it?",
+          outcome: "Russia suffered a humiliating defeat in the Crimean War (1853\u201356), exposing its economic and military backwardness and forcing painful reforms, including the emancipation of the serfs in 1861. Worse, Austria refused to support Russia during the war and even threatened to join the other side \u2014 a betrayal Russia would not forget, poisoning Austro-Russian relations for the rest of the century."
+        },
+        austria: {
+          title: "A Fateful Neutrality, Then Two Defeats",
+          context: "Russia expects Austria's support in its war against the Ottomans, Britain, and France \u2014 support owed after decades of conservative solidarity. But Austria has its own interests in the Balkans, and its neighbor Prussia is quietly building toward a reckoning over who will lead the German-speaking world.",
+          prompt: "Does Austria back Russia in the Crimean War as old alliance ties suggest \u2014 and can Austria hold its own if Prussia decides to force the question of German leadership by force?",
+          outcome: "Austria chose neutrality in the Crimean War rather than support Russia, a decision that permanently soured relations with its former ally. That isolation proved costly: Prussia defeated Austria decisively at the Battle of K\u00f6niggr\u00e4tz in 1866, excluding Austria from German affairs for good. The shock of defeat forced Austria to reorganize as the Dual Monarchy of Austria-Hungary in 1867."
+        },
+        germany: {
+          title: "Blood and Iron: Forging an Empire",
+          context: "Otto von Bismarck becomes Prussia's chief minister in 1862, determined to unify the German states under Prussian leadership \u2014 \u201cnot through speeches and majority votes,\u201d he declares, \u201cbut by blood and iron.\u201d Denmark, Austria, and France each stand in the way of this goal, one after another.",
+          prompt: "How does Prussia use war \u2014 against Denmark, then Austria, then France \u2014 to unify the German states under its own leadership?",
+          outcome: "Prussia defeated Denmark in 1864, then turned on its former ally Austria and won decisively at K\u00f6niggr\u00e4tz in 1866, excluding Austria from German affairs entirely. Bismarck then engineered a war with France in 1870 by editing the provocative \u201cEms Dispatch\u201d for publication; Prussia and its German allies crushed France, captured Napoleon III, and proclaimed the new German Empire at the Palace of Versailles in January 1871."
+        },
+        ottoman: {
+          title: "War, Debt, and the \u2018Sick Man of Europe\u2019",
+          context: "Russia claims the right to protect Ottoman Christians as a pretext to expand into Ottoman territory, triggering a war that draws in Britain and France on the Ottoman side. Victory, if it comes, will not come cheap \u2014 European loans to finance the war effort are stacking up.",
+          prompt: "Can the Ottoman Empire survive the war with Russia by leaning on British and French support \u2014 and at what long-term cost?",
+          outcome: "With British and French help, the Ottoman Empire held off Russia in the Crimean War (1853\u201356), but the victory came at a steep price: the empire now relied heavily on European loans and diplomatic support to survive, and European observers increasingly referred to it as the \u201cSick Man of Europe.\u201d Sultan Abdulmejid I's Tanzimat reforms continued trying to modernize the state even as its finances grew more precarious."
+        }
+      }
+    },
+    { year: "1871\u20131890", title: "Bismarck's Alliance System",
+      context: "With Germany newly unified and France isolated, Chancellor Bismarck spends two decades building a web of alliances designed to keep the peace \u2014 and keep France friendless. Austria-Hungary, freshly reorganized after its 1867 compromise, becomes his closest partner; Russia is drawn in and out of the circle; and a rising Italy looks for a great-power patron of its own.",
+      prompt: "Which alliances form or strengthen in this period? Select any nations that align.",
+      outcome: "Germany, Austria-Hungary, and Russia first formed the loose Three Emperors' League in 1873, but Balkan rivalry between Austria-Hungary and Russia pulled it apart. Germany and Austria-Hungary then signed the more binding Dual Alliance in 1879, promising mutual defense against Russia \u2014 the anchor of Bismarck's whole system. Italy joined them in 1882 to form the Triple Alliance, though its loyalty would prove thin. France, meanwhile, remained isolated and resentful \u2014 exactly as Bismarck intended.",
+      perspectives: {
+        britain: {
+          title: "Splendid Isolation",
+          context: "A newly unified Germany is building a web of alliances on the continent, but Britain deliberately stays out of it, preferring to avoid binding continental commitments. Britain's attention is increasingly drawn to Africa, where the European powers are carving up the continent.",
+          prompt: "Does Britain remain aloof from Bismarck's alliance system, focusing instead on empire and colonial expansion?",
+          outcome: "Britain maintained its policy of \u201csplendid isolation,\u201d avoiding entanglement in Bismarck's continental alliance system entirely. Instead, Britain focused on consolidating its empire, participating in the Berlin Conference of 1884\u201385 that formalized the European \u201cScramble for Africa\u201d \u2014 expanding British colonial holdings while continental rivals jockeyed for position among themselves."
+        },
+        france: {
+          title: "Isolated by Design",
+          context: "Bismarck has built his entire alliance system around one goal: keeping France friendless and without allies capable of helping it reclaim Alsace-Lorraine. France is rebuilding its military and looking for any partner willing to break its isolation.",
+          prompt: "Can France find a way out of its diplomatic isolation \u2014 or does Bismarck's system succeed in keeping France alone?",
+          outcome: "Bismarck's alliance system worked exactly as designed: France remained diplomatically isolated throughout the 1870s and 1880s, unable to find a great-power partner willing to risk war with Germany. France instead turned to colonial expansion in Africa and Indochina to restore national prestige, while continuing to search for an ally who might one day help settle the score over Alsace-Lorraine."
+        },
+        russia: {
+          title: "Betrayed at Berlin",
+          context: "Russia joins Germany and Austria-Hungary in a loose partnership meant to preserve conservative solidarity, but Russia's own ambitions in the Balkans \u2014 especially after a war against the Ottomans \u2014 put it on a collision course with Austria-Hungary's interests in the same region.",
+          prompt: "Can Russia's partnership with Germany and Austria-Hungary survive its own ambitions in the Balkans \u2014 especially after a war with the Ottoman Empire?",
+          outcome: "Russia defeated the Ottoman Empire in the Russo-Turkish War of 1877\u201378 and imposed a treaty creating a large, Russian-friendly Bulgaria. But the Congress of Berlin, engineered by Bismarck, forced Russia to accept a much smaller Bulgaria and watched Austria-Hungary gain control of Bosnia instead. Russia felt betrayed by Germany's role at Berlin, souring relations with both of its former partners and pushing Russia to look elsewhere for support."
+        },
+        austria: {
+          title: "Germany's Indispensable Ally",
+          context: "The newly formed Dual Monarchy of Austria-Hungary needs a reliable great-power partner, and Germany needs a dependable ally against Russia. Meanwhile, an Ottoman war against Russia creates an opening in the Balkans that Austria-Hungary is eager to exploit.",
+          prompt: "Does Austria-Hungary bind itself closely to Germany \u2014 and how does it position itself in the Balkans as Russia and the Ottomans go to war?",
+          outcome: "Austria-Hungary signed the Dual Alliance with Germany in 1879, a defensive pact that became the cornerstone of its foreign policy. When Russia defeated the Ottomans in 1877\u201378, Austria-Hungary used the Congress of Berlin to gain administrative control of Bosnia-Herzegovina \u2014 a gain that extended its Balkan influence but deepened its rivalry with Russia and planted the seeds of future crisis."
+        },
+        germany: {
+          title: "Bismarck the Balancer",
+          context: "Chancellor Bismarck has one overriding goal: keep France isolated and prevent any war Germany might have to fight on two fronts. He builds a careful web of alliances \u2014 with Austria-Hungary, with Russia, eventually with Italy \u2014 to manage the great powers' rivalries without letting any crisis spiral out of control.",
+          prompt: "Can Bismarck hold his alliance system together as Russia and Austria-Hungary clash over the Balkans \u2014 and does he risk taking sides?",
+          outcome: "Bismarck built the Dual Alliance with Austria-Hungary (1879) and the Triple Alliance with Italy (1882), while trying to keep Russia friendly through separate arrangements. When war between Russia and the Ottomans threatened to spiral into a wider Balkan crisis, Bismarck hosted the Congress of Berlin in 1878, positioning Germany as an \u201chonest broker\u201d \u2014 but his role in limiting Russia's gains there quietly damaged German-Russian relations for years to come."
+        },
+        ottoman: {
+          title: "Losing the Balkans, Drowning in Debt",
+          context: "Russia declares war on the Ottoman Empire in 1877 in support of Balkan uprisings, and the resulting conflict threatens to strip away most of what remains of Ottoman Europe. Foreign loans taken out to modernize and to fight past wars are now coming due, and the empire cannot pay.",
+          prompt: "Can the Ottoman Empire survive a new war with Russia \u2014 and what happens when it can no longer pay its foreign debts?",
+          outcome: "Russia defeated the Ottoman Empire in the war of 1877\u201378, and though the Congress of Berlin softened the harshest terms, the empire still lost Bulgaria, Serbia, Montenegro, and Romania as independent or autonomous states, while Austria-Hungary took over Bosnia. Crushed by war debt, the empire's finances came under direct European control with the creation of the Ottoman Public Debt Administration in 1881 \u2014 foreign creditors now collected Ottoman taxes directly. Sultan Abdul Hamid II responded by suspending the constitution and ruling as an autocrat."
+        }
+      }
+    },
+    { year: "1891\u20131914", title: "The Road to World War",
+      context: "Bismarck is gone, and his successors let Russia's ties to Germany lapse. Over the next two decades the diplomatic map is redrawn twice more \u2014 first as France finds new partners, then as Britain abandons a century of avoiding continental commitments. A series of crises in the Balkans tests every alliance your class has built, until a single assassination sets the whole system in motion.",
+      prompt: "Final positions: as the crises mount and then break in 1914, who stands with whom?",
+      outcome: "France and Russia allied in 1894, giving Bismarck's old nightmare \u2014 a two-front war \u2014 real shape. Britain settled its colonial disputes with France in 1904 and then with Russia in 1907, completing the Triple Entente. Austria-Hungary's annexation of Bosnia in 1908 humiliated Russia and hardened Balkan tensions; the Balkan Wars of 1912\u201313 then stripped the Ottoman Empire of nearly all its European territory and left Serbia emboldened. When Archduke Franz Ferdinand was assassinated in Sarajevo in 1914, Austria-Hungary declared war on Serbia, Russia mobilized to defend Serbia, Germany declared war on Russia and France, and Britain entered after Germany invaded Belgium. The Ottoman Empire joined the Central Powers later that year. More than a century of alliance-building had turned a regional crisis into a continental war.",
+      perspectives: {
+        britain: {
+          title: "Abandoning Isolation",
+          context: "Germany's naval buildup under Kaiser Wilhelm II directly threatens British naval supremacy, the one advantage Britain has always guarded above all else. For the first time in a century, Britain begins looking for continental partners.",
+          prompt: "Does Britain finally abandon isolation and commit to continental partners \u2014 and how far does that commitment go when war finally breaks out?",
+          outcome: "Alarmed by the Anglo-German naval race, Britain settled old rivalries with France (the 1904 Entente Cordiale) and then Russia (1907), completing the Triple Entente \u2014 though without a binding military commitment. When Germany invaded Belgium in August 1914, violating a neutrality Britain had long guaranteed, Britain declared war, entering the conflict on the side of France and Russia."
+        },
+        france: {
+          title: "Ending Isolation, Awaiting Revenge",
+          context: "Decades of diplomatic isolation are finally ending as France builds new partnerships, first with Russia and then with Britain. Tensions with Germany flare repeatedly over colonial claims in Morocco, each crisis edging Europe closer to war.",
+          prompt: "Does France's new web of alliances hold together as tensions with Germany rise \u2014 and is France ready when war finally comes?",
+          outcome: "The Franco-Russian Alliance (1894) and the Entente Cordiale with Britain (1904) finally ended France's isolation, and two Moroccan crises with Germany (1905, 1911) nearly sparked war outright. When the July Crisis of 1914 erupted, France mobilized alongside Russia, and Germany declared war \u2014 giving France its long-awaited chance to fight for Alsace-Lorraine, now backed by powerful allies."
+        },
+        russia: {
+          title: "Wounded Giant, Patron of the Slavs",
+          context: "A humiliating defeat in a war with Japan and a revolution at home in 1905 have exposed Russia's weakness, but Russia's role as protector of Serbia and the Balkan Slavs only grows more central to its national identity.",
+          prompt: "Can a weakened Russia still act as protector of Serbia and the Balkans \u2014 and what happens when a crisis in the Balkans finally forces the question?",
+          outcome: "Despite the humiliations of 1904\u20131905, Russia completed the Triple Entente with France and Britain in 1907 and continued to see itself as protector of Serbia and the Slavic Balkans. When Austria-Hungary issued an ultimatum to Serbia after the assassination of Archduke Franz Ferdinand in 1914, Russia mobilized in Serbia's defense \u2014 the move that turned a regional crisis into a continental war."
+        },
+        austria: {
+          title: "A Powder Keg in the Balkans",
+          context: "Serbian nationalism increasingly threatens Austria-Hungary's hold over its own South Slav populations, especially after Austria-Hungary formally annexes Bosnia-Herzegovina in 1908 and Serbia emerges stronger from the Balkan Wars of 1912\u201313.",
+          prompt: "How does Austria-Hungary handle its deepening crisis with Serbia \u2014 and what happens when an assassination finally forces the issue?",
+          outcome: "Austria-Hungary's 1908 annexation of Bosnia humiliated Russia and enraged Serbia, and Serbia's gains in the Balkan Wars of 1912\u201313 only deepened Vienna's alarm. When a Bosnian Serb nationalist assassinated Archduke Franz Ferdinand in Sarajevo in June 1914, Austria-Hungary issued a deliberately harsh ultimatum to Serbia and declared war \u2014 setting the alliance system built over decades into catastrophic motion."
+        },
+        germany: {
+          title: "Weltpolitik and the Blank Check",
+          context: "Kaiser Wilhelm II has let Bismarck's careful balancing act lapse, pursuing an aggressive \u201cworld policy\u201d of naval buildup and colonial ambition that alarms Britain and drives France and Russia together. When Austria-Hungary's heir is assassinated, Germany's response will decide whether the crisis stays local or goes continental.",
+          prompt: "Does Germany rein in its ally Austria-Hungary after the Sarajevo assassination, or give it unconditional support \u2014 whatever the consequences?",
+          outcome: "Germany gave Austria-Hungary a \u201cblank check\u201d of unconditional support after the Sarajevo assassination, encouraging a hard line against Serbia. When Russia mobilized to defend Serbia, Germany declared war on Russia and then France, and invaded Belgium as part of the Schlieffen Plan \u2014 turning a Balkan crisis into a war against nearly every power in the room at once."
+        },
+        ottoman: {
+          title: "A Fading Empire Seeks a Patron",
+          context: "A group of reformist officers known as the Young Turks seize power in 1908, promising to restore constitutional government and reverse decades of decline. But the empire loses nearly all its remaining European territory in the Balkan Wars of 1912\u201313, and Istanbul urgently needs a great-power patron to guarantee what's left.",
+          prompt: "Which great power does the Ottoman Empire turn to for protection and modernization \u2014 and how far does that partnership go when war breaks out in Europe?",
+          outcome: "The Ottoman Empire increasingly turned to Germany for support \u2014 German officers trained the Ottoman army, and German capital funded the Baghdad Railway. When war broke out in 1914, the Ottoman Empire joined the Central Powers that November, a fateful choice that would end, four years later, with the empire's total collapse."
+        }
+      }
+    }
+  ];
+
+  var LS_NOTES_PREFIX = "alliance1914_notes_";
+  var LS_MOD_STATE = "alliance1914_moderator_state_v1";
+
+  function safeGet(key){ try { return localStorage.getItem(key); } catch(e){ return null; } }
+  function safeSet(key, val){ try { localStorage.setItem(key, val); } catch(e){} }
+
+  var state = { screen: "start" };
+
+  function loadModState(){
+    var raw = safeGet(LS_MOD_STATE);
+    if (raw) {
+      try { return JSON.parse(raw); } catch(e) {}
+    }
+    return { round: 0, revealed: false, picks: [], edges: [] };
+  }
+  function saveModState(m){ safeSet(LS_MOD_STATE, JSON.stringify(m)); }
+
+  // ---- Live shared game state (db capability), with single-device fallback ----
+  var dbCap = null;
+  var docRef = null;
+  var shared = null;
+  var dbState = "pending"; // pending | live | unavailable
+
+  function requestKey(a, b){
+    var arr = [a, b].sort();
+    return arr[0] + "_" + arr[1];
+  }
+  function defaultShared(){
+    return { round: 0, revealed: false, edges: [], relations: {}, neutral: {} };
+  }
+  function normalizeShared(raw){
+    raw = raw || {};
+    var round = typeof raw.round === "number" ? raw.round : 0;
+    if (round < 0) round = 0;
+    if (round > ROUNDS.length - 1) round = ROUNDS.length - 1;
+    var edges = Array.isArray(raw.edges) ? raw.edges : [];
+    var relations = (raw.relations && typeof raw.relations === "object" && !Array.isArray(raw.relations)) ? raw.relations : {};
+    var neutral = (raw.neutral && typeof raw.neutral === "object" && !Array.isArray(raw.neutral)) ? raw.neutral : {};
+    return { round: round, revealed: !!raw.revealed, edges: edges, relations: relations, neutral: neutral };
+  }
+
+  function rerenderIfLive(){
+    if (state.screen === "nation" || state.screen === "moderator") render();
+  }
+
+  function initDb(){
+    var maybe;
+    try {
+      maybe = window.claude && window.claude.use ? window.claude.use("db") : null;
+    } catch(e){ maybe = null; }
+    if (!maybe) { dbState = "unavailable"; rerenderIfLive(); return; }
+    maybe.then(function(cap){
+      if (!cap) { dbState = "unavailable"; rerenderIfLive(); return; }
+      dbCap = cap;
+      docRef = dbCap.doc("game/state");
+      docRef.get().then(function(snap){
+        if (!snap.exists) { return docRef.set(defaultShared()); }
+      })["catch"](function(){}).then(function(){
+        docRef.onSnapshot(function(snap){
+          shared = normalizeShared(snap.exists ? snap.data() : defaultShared());
+          dbState = "live";
+          rerenderIfLive();
+        }, function(){
+          dbState = "unavailable";
+          rerenderIfLive();
+        });
+      });
+    })["catch"](function(){
+      dbState = "unavailable";
+      rerenderIfLive();
+    });
+  }
+  initDb();
+
+  function edgesWithoutPair(edges, a, b){
+    return edges.filter(function(e){
+      return !((e.a === a && e.b === b) || (e.a === b && e.b === a));
+    });
+  }
+
+  function proposeAlliance(fromId, toId){
+    if (!docRef || !shared) return;
+    var key = requestKey(fromId, toId);
+    var existing = shared.relations[key];
+    if (existing && (existing.status === "pending" || existing.status === "accepted")) return;
+    var patch = {};
+    patch[key] = { from: fromId, to: toId, status: "pending" };
+    docRef.update({ relations: patch })["catch"](function(){});
+  }
+  function respondAlliance(key, accept){
+    if (!docRef || !shared) return;
+    var rel = shared.relations[key];
+    if (!rel || rel.status !== "pending") return;
+    if (accept) {
+      var r = ROUNDS[shared.round];
+      var newEdges = shared.edges.slice();
+      newEdges.push({ a: rel.from, b: rel.to, year: r.year });
+      var patch = {};
+      patch[key] = { from: rel.from, to: rel.to, status: "accepted" };
+      docRef.update({ relations: patch, edges: newEdges })["catch"](function(){});
+    } else {
+      var patch2 = {};
+      patch2[key] = { from: rel.from, to: rel.to, status: "declined" };
+      docRef.update({ relations: patch2 })["catch"](function(){});
+    }
+  }
+  function declareWar(fromId, toId){
+    if (!docRef || !shared) return;
+    var key = requestKey(fromId, toId);
+    var patch = {};
+    patch[key] = { from: fromId, to: toId, status: "war" };
+    var newEdges = edgesWithoutPair(shared.edges, fromId, toId);
+    docRef.update({ relations: patch, edges: newEdges })["catch"](function(){});
+  }
+  function endAlliance(fromId, toId){
+    if (!docRef || !shared) return;
+    var key = requestKey(fromId, toId);
+    var rel = shared.relations[key];
+    if (!rel || rel.status !== "accepted") return;
+    var patch = {};
+    patch[key] = { from: fromId, to: toId, status: "ended" };
+    var newEdges = edgesWithoutPair(shared.edges, fromId, toId);
+    docRef.update({ relations: patch, edges: newEdges })["catch"](function(){});
+  }
+  function makePeace(fromId, toId){
+    if (!docRef || !shared) return;
+    var key = requestKey(fromId, toId);
+    var rel = shared.relations[key];
+    if (!rel || rel.status !== "war") return;
+    var patch = {};
+    patch[key] = { from: fromId, to: toId, status: "peace" };
+    docRef.update({ relations: patch })["catch"](function(){});
+  }
+  function toggleNeutral(myId){
+    if (!docRef || !shared) return;
+    var patch = {};
+    patch[myId] = !shared.neutral[myId];
+    docRef.update({ neutral: patch })["catch"](function(){});
+  }
+  function revealRound(){
+    if (!docRef || !shared) return;
+    docRef.update({ revealed: true })["catch"](function(){});
+  }
+  function nextRound(){
+    if (!docRef || !shared) return;
+    var isLast = shared.round === ROUNDS.length - 1;
+    if (isLast) {
+      docRef.set(defaultShared())["catch"](function(){});
+    } else {
+      docRef.set({ round: shared.round + 1, revealed: false, edges: shared.edges, relations: {}, neutral: {} })["catch"](function(){});
+    }
+  }
+  function resetShared(){
+    if (!docRef) return;
+    docRef.set(defaultShared())["catch"](function(){});
+  }
+
+  var app = document.getElementById("app");
+
+  function render(){
+    if (state.screen === "start") renderStart();
+    else if (state.screen === "nation") renderNation(state.nationId);
+    else if (state.screen === "moderator") renderModerator();
+  }
+
+  function el(html){
+    var d = document.createElement("div");
+    d.innerHTML = html;
+    return d.firstElementChild;
+  }
+
+  function timelineHtml(m){
+    return '<div class="timeline">' + ROUNDS.map(function(rr, i){
+      var cls = "tstep" + (i === m.round ? " active" : (i < m.round || (i === m.round && m.revealed) ? " done" : ""));
+      return '<div class="' + cls + '">' + rr.year + '</div>';
+    }).join("") + '</div>';
+  }
+
+  function renderStart(){
+    var cards = ORDER.map(function(id){
+      var n = NATIONS[id];
+      return '<button class="nation-card" data-nation="' + id + '">' +
+        '<span class="seal">' + n.code + '</span>' +
+        '<span><span class="name">' + n.name + '</span><br><span class="sub">' + n.tagline + '</span></span>' +
+        '</button>';
+    }).join("");
+
+    app.innerHTML =
+      '<div class="masthead">' +
+        '<div class="kicker">A CLASSROOM DIPLOMATIC SIMULATION</div>' +
+        '<h1>The Alliance System</h1>' +
+        '<div class="dates">1789 &ndash; 1914</div>' +
+      '</div>' +
+      '<p>Six great powers. Six eras, from the French Revolution to the outbreak of the First World War. One question: will your choices lead somewhere different than history &mdash; or straight back to it?</p>' +
+      '<p>Each player selects their nation on their own laptop and reads their private brief. Negotiate with your classmates &mdash; in person or in chat &mdash; then record your own nation\u2019s alignment each round. The alliance web updates live for everyone.</p>' +
+      '<hr class="rule">' +
+      '<h3 style="font-family:\'Courier Prime\',monospace;font-size:0.85rem;letter-spacing:0.08em;color:var(--brass);text-transform:uppercase;">Choose your power</h3>' +
+      '<div class="nation-grid">' + cards + '</div>' +
+      '<button class="nation-card mod-card" id="mod-btn">' +
+        '<span class="seal">CB</span>' +
+        '<span><span class="name">Class Board</span><br><span class="sub">A shared, no-nation view of the timeline &amp; alliance web</span></span>' +
+      '</button>';
+
+    Array.prototype.forEach.call(app.querySelectorAll(".nation-card[data-nation]"), function(btn){
+      btn.addEventListener("click", function(){
+        state.screen = "nation";
+        state.nationId = btn.getAttribute("data-nation");
+        render();
+        window.scrollTo(0,0);
+      });
+    });
+    document.getElementById("mod-btn").addEventListener("click", function(){
+      state.screen = "moderator";
+      render();
+      window.scrollTo(0,0);
+    });
+  }
+
+  function buildLiveRoundPanel(myId){
+    if (dbState === "pending") {
+      return '<div class="panel"><h3>Class negotiation</h3><p style="margin:0;color:var(--ink-soft);">Connecting to the shared game board&hellip;</p></div>';
+    }
+    if (dbState === "unavailable" || !shared) {
+      return '<div class="panel"><h3>Class negotiation</h3><p style="margin:0;color:var(--ink-soft);">Live sync isn\u2019t available in this view. Play this game through its published Claude link, shared with your classmates, so everyone\u2019s laptop stays in sync &mdash; or have one device run the Class Board for the whole class instead.</p></div>';
+    }
+    var m = shared;
+    var baseRound = ROUNDS[m.round];
+    var perspective = (baseRound.perspectives && baseRound.perspectives[myId]) || {};
+    var r = {
+      year: baseRound.year,
+      title: perspective.title || baseRound.title,
+      context: perspective.context || baseRound.context,
+      prompt: perspective.prompt || baseRound.prompt,
+      outcome: perspective.outcome || baseRound.outcome
+    };
+    var isLast = m.round === ROUNDS.length - 1;
+    var rels = m.relations;
+    var iAmNeutral = !!m.neutral[myId];
+
+    var otherInfo = {};
+    ORDER.forEach(function(id){
+      if (id === myId) return;
+      var key = requestKey(myId, id);
+      var rel = rels[key];
+      otherInfo[id] = rel ? { status: rel.status, from: rel.from, key: key } : { status: "none", key: key };
+    });
+
+    var proposeRows = "";
+    if (!m.revealed) {
+      proposeRows = ORDER.filter(function(id){ return id !== myId; }).map(function(id){
+        var info = otherInfo[id];
+        var right;
+        if (info.status === "none" || info.status === "declined" || info.status === "ended" || info.status === "peace") {
+          var label = info.status === "declined" ? "Declined" : (info.status === "ended" ? "Alliance ended" : (info.status === "peace" ? "At peace" : ""));
+          right = (label ? '<span class="req-status">' + label + '</span> ' : "") +
+            '<button class="secondary propose-btn" data-target="' + id + '">Propose alliance</button> ' +
+            '<button class="secondary warbtn" data-target="' + id + '">Declare war</button>';
+        } else if (info.status === "pending" && info.from === myId) {
+          right = '<span class="req-status">Awaiting their response&hellip;</span> ' +
+            '<button class="secondary warbtn" data-target="' + id + '">Declare war</button>';
+        } else if (info.status === "pending") {
+          right = '<span class="req-status">They\u2019ve proposed to you</span> ' +
+            '<button class="respond-btn" data-key="' + info.key + '" data-accept="1">Accept</button> ' +
+            '<button class="secondary respond-btn" data-key="' + info.key + '" data-accept="0">Decline</button> ' +
+            '<button class="secondary warbtn" data-target="' + id + '">Declare war</button>';
+        } else if (info.status === "accepted") {
+          right = '<span class="badge-allied">Allied</span> ' +
+            '<button class="secondary endbtn" data-target="' + id + '">End alliance</button> ' +
+            '<button class="secondary warbtn" data-target="' + id + '">Declare war</button>';
+        } else if (info.status === "war") {
+          right = '<span class="badge-war">At war</span> ' +
+            '<button class="secondary peacebtn" data-target="' + id + '">Make peace</button>';
+        }
+        return '<div class="req-row"><span class="req-name">' + NATIONS[id].code + ' &mdash; ' + NATIONS[id].name + '</span><span>' + right + '</span></div>';
+      }).join("");
+    }
+
+    var neutralHtml = "";
+    if (!m.revealed) {
+      neutralHtml = '<div class="btn-row" style="margin-top:0.8rem;">' +
+        '<button class="secondary" id="neutral-btn">' + (iAmNeutral ? "Withdraw neutrality declaration" : "Declare neutrality this round") + '</button>' +
+        (iAmNeutral ? ' <span class="req-status">Currently declared neutral</span>' : "") +
+      '</div>';
+    }
+
+    var elsewhereRelItems = Object.keys(rels).filter(function(k){
+      var rel = rels[k];
+      return rel.from !== myId && rel.to !== myId;
+    }).map(function(k){
+      var rel = rels[k];
+      var label = { accepted: "allied", declined: "declined", ended: "alliance ended", war: "at war", peace: "at peace", pending: "pending" }[rel.status] || rel.status;
+      return '<li>' + NATIONS[rel.from].code + ' \u2194 ' + NATIONS[rel.to].code + ' &mdash; ' + label + '</li>';
+    });
+    var elsewhereNeutralItems = ORDER.filter(function(id){ return id !== myId && m.neutral[id]; }).map(function(id){
+      return '<li>' + NATIONS[id].code + ' has declared neutrality</li>';
+    });
+    var elsewhereAll = elsewhereRelItems.concat(elsewhereNeutralItems).join("");
+    var elsewhereHtml = (!m.revealed && elsewhereAll)
+      ? '<div class="panel"><h3>Elsewhere this round</h3><ul class="elsewhere-list">' + elsewhereAll + '</ul></div>'
+      : "";
+
+    var controlsHtml;
+    if (!m.revealed) {
+      controlsHtml = '<button class="secondary" id="reveal-live-btn">Reveal what actually happened</button>';
+    } else {
+      controlsHtml = '<button id="next-live-btn">' + (isLast ? "Play again from 1789" : "Next round \u2192") + '</button>';
+    }
+
+    var outcomeBlock = m.revealed
+      ? '<div class="outcome"><span class="label">What actually happened</span>' + r.outcome + '</div>'
+      : "";
+
+    var finalBlock = "";
+    if (isLast && m.revealed) {
+      finalBlock =
+        '<hr class="rule thick">' +
+        '<h3 style="font-family:\'Fraunces\',serif;font-size:1.3rem;">Where history landed</h3>' +
+        '<div class="final-blocs">' +
+          '<div class="bloc-box entente"><h4>The Triple Entente</h4>Great Britain &middot; France &middot; Russia</div>' +
+          '<div class="bloc-box central"><h4>The Central Powers</h4>Germany &middot; Austria-Hungary &middot; Ottoman Empire</div>' +
+        '</div>';
+    }
+
+    return '<div class="panel" id="live-panel">' +
+      '<h3>Class negotiation &mdash; live</h3>' +
+      timelineHtml(m) +
+      '<div class="round-year">' + r.year + '</div>' +
+      '<div style="font-family:\'Fraunces\',serif;font-weight:600;font-size:1.2rem;margin-bottom:0.3rem;">' + r.title + '</div>' +
+      '<p style="margin-top:0;">' + r.context + '</p>' +
+      '<p style="color:var(--ink-soft);"><em>' + r.prompt + '</em></p>' +
+      (proposeRows ? ('<div style="margin-top:0.8rem;">' + proposeRows + '</div>') : "") +
+      neutralHtml +
+      '<div class="btn-row">' + controlsHtml + '</div>' +
+      outcomeBlock +
+    '</div>' +
+    elsewhereHtml +
+    finalBlock;
+  }
+
+  function renderNation(id){
+    var n = NATIONS[id];
+    var eraNoteHtml = n.eraNote
+      ? '<div class="panel" style="border-color:var(--brass);"><h3>Early-round note</h3><p style="margin:0;">' + n.eraNote + '</p></div>'
+      : "";
+
+    app.innerHTML =
+      '<div class="topbar">' +
+        '<button class="secondary" id="back-btn">&larr; Back</button>' +
+        '<span class="who">PRIVATE BRIEF &mdash; DO NOT SHARE SCREEN</span>' +
+      '</div>' +
+      '<div class="dossier-head">' +
+        '<span class="seal">' + n.code + '</span>' +
+        '<div><div class="stamp">CONFIDENTIAL</div><h1 style="margin:0;">' + n.name + '</h1></div>' +
+      '</div>' +
+      '<p style="font-style:italic;color:var(--ink-soft);margin-top:0;">' + n.tagline + '</p>' +
+      '<hr class="rule">' +
+      eraNoteHtml +
+      buildLiveRoundPanel(id);
+
+    document.getElementById("back-btn").addEventListener("click", function(){
+      state.screen = "start";
+      render();
+      window.scrollTo(0,0);
+    });
+
+    if (dbState === "live" && shared) {
+      Array.prototype.forEach.call(app.querySelectorAll(".propose-btn"), function(btn){
+        btn.addEventListener("click", function(){ proposeAlliance(id, btn.getAttribute("data-target")); });
+      });
+      Array.prototype.forEach.call(app.querySelectorAll(".respond-btn"), function(btn){
+        btn.addEventListener("click", function(){
+          respondAlliance(btn.getAttribute("data-key"), btn.getAttribute("data-accept") === "1");
+        });
+      });
+      Array.prototype.forEach.call(app.querySelectorAll(".warbtn"), function(btn){
+        btn.addEventListener("click", function(){ declareWar(id, btn.getAttribute("data-target")); });
+      });
+      Array.prototype.forEach.call(app.querySelectorAll(".endbtn"), function(btn){
+        btn.addEventListener("click", function(){ endAlliance(id, btn.getAttribute("data-target")); });
+      });
+      Array.prototype.forEach.call(app.querySelectorAll(".peacebtn"), function(btn){
+        btn.addEventListener("click", function(){ makePeace(id, btn.getAttribute("data-target")); });
+      });
+      var neutralBtn = document.getElementById("neutral-btn");
+      if (neutralBtn) neutralBtn.addEventListener("click", function(){ toggleNeutral(id); });
+      var revealBtn = document.getElementById("reveal-live-btn");
+      if (revealBtn) revealBtn.addEventListener("click", function(){ revealRound(); });
+      var nextBtn = document.getElementById("next-live-btn");
+      if (nextBtn) nextBtn.addEventListener("click", function(){ nextRound(); window.scrollTo(0,0); });
+    }
+  }
+
+  function renderModerator(){
+    var usingLive = (dbState === "live" && !!shared);
+
+    if (dbState === "pending") {
+      app.innerHTML =
+        '<div class="topbar"><button class="secondary" id="back-btn">&larr; Back</button><span class="who">CLASS BOARD</span></div>' +
+        '<div class="masthead" style="margin-bottom:1rem;"><div class="kicker">A CLASSROOM DIPLOMATIC SIMULATION</div><h1 style="font-size:clamp(1.6rem,4vw,2.2rem);">The Alliance System</h1></div>' +
+        '<p style="color:var(--ink-soft);">Connecting to the shared game board&hellip;</p>';
+      document.getElementById("back-btn").addEventListener("click", function(){ state.screen = "start"; render(); window.scrollTo(0,0); });
+      return;
+    }
+
+    if (usingLive) { renderModeratorLive(); } else { renderModeratorLocal(); }
+  }
+
+  function renderModeratorLive(){
+    var m = shared;
+    var r = ROUNDS[m.round];
+    var isLast = m.round === ROUNDS.length - 1;
+
+    var relRows = Object.keys(m.relations).map(function(k){
+      var rel = m.relations[k];
+      var label = { accepted: "allied", declined: "declined", ended: "alliance ended", war: "at war", peace: "at peace", pending: "pending" }[rel.status] || rel.status;
+      return '<li>' + NATIONS[rel.from].code + ' \u2194 ' + NATIONS[rel.to].code + ' &mdash; ' + label + '</li>';
+    });
+    var neutralRows = ORDER.filter(function(id){ return m.neutral[id]; }).map(function(id){
+      return '<li>' + NATIONS[id].code + ' has declared neutrality</li>';
+    });
+    var reqRows = relRows.concat(neutralRows).join("");
+    var reqBlock = (!m.revealed)
+      ? ('<div class="panel"><h3>This round\u2019s diplomacy</h3>' +
+          (reqRows ? ('<ul class="elsewhere-list">' + reqRows + '</ul>') : '<p style="margin:0;color:var(--ink-soft);">No moves yet this round.</p>') +
+        '</div>')
+      : "";
+
+    var outcomeBlock = m.revealed
+      ? '<div class="outcome"><span class="label">What actually happened</span>' + r.outcome + '</div>'
+      : "";
+
+    var finalHtml = "";
+    if (isLast && m.revealed) {
+      finalHtml =
+        '<hr class="rule thick">' +
+        '<h2>Where history landed</h2>' +
+        '<p>By 1914, these six powers had settled into two blocs:</p>' +
+        '<div class="final-blocs">' +
+          '<div class="bloc-box entente"><h4>The Triple Entente</h4>Great Britain &middot; France &middot; Russia</div>' +
+          '<div class="bloc-box central"><h4>The Central Powers</h4>Germany &middot; Austria-Hungary &middot; Ottoman Empire</div>' +
+        '</div>' +
+        '<p style="margin-top:1rem;">Compare that to the alliances and wars your class actually formed. Where did your choices match history &mdash; and where did they diverge?</p>';
+    }
+
+    app.innerHTML =
+      '<div class="topbar">' +
+        '<button class="secondary" id="back-btn">&larr; Back</button>' +
+        '<span class="who">CLASS BOARD &mdash; LIVE</span>' +
+      '</div>' +
+      '<div class="masthead" style="margin-bottom:1rem;">' +
+        '<div class="kicker">A CLASSROOM DIPLOMATIC SIMULATION</div>' +
+        '<h1 style="font-size:clamp(1.6rem,4vw,2.2rem);">The Alliance System</h1>' +
+      '</div>' +
+      timelineHtml(m) +
+      '<div class="round-year">' + r.year + '</div>' +
+      '<h2 class="round-title">' + r.title + '</h2>' +
+      '<p>' + r.context + '</p>' +
+      '<p style="color:var(--ink-soft);"><em>' + r.prompt + '</em></p>' +
+      '<p style="color:var(--ink-soft);font-size:0.9rem;">Players propose and accept alliances from their own nation screens. This board shows the shared result.</p>' +
+      reqBlock +
+      '<div class="btn-row">' +
+        (m.revealed
+          ? '<button id="next-btn">' + (isLast ? "Restart game" : "Next round \u2192") + '</button>'
+          : '<button id="reveal-btn">Reveal what actually happened</button>') +
+        '<button class="secondary" id="reset-btn">Reset entire game</button>' +
+      '</div>' +
+      outcomeBlock +
+      finalHtml;
+
+    document.getElementById("back-btn").addEventListener("click", function(){
+      state.screen = "start"; render(); window.scrollTo(0,0);
+    });
+    document.getElementById("reset-btn").addEventListener("click", function(){
+      if (confirm("Reset the class board back to 1789? This clears all recorded alliances for everyone.")) {
+        resetShared();
+        window.scrollTo(0,0);
+      }
+    });
+    if (!m.revealed) {
+      document.getElementById("reveal-btn").addEventListener("click", function(){ revealRound(); });
+    } else {
+      document.getElementById("next-btn").addEventListener("click", function(){ nextRound(); window.scrollTo(0,0); });
+    }
+  }
+
+  function renderModeratorLocal(){
+    var m = loadModState();
+    var r = ROUNDS[m.round];
+    var isLast = m.round === ROUNDS.length - 1;
+
+    var chips = ORDER.map(function(id){
+      var sel = m.picks.indexOf(id) > -1;
+      return '<button class="chip' + (sel ? " selected" : "") + '" data-id="' + id + '">' + NATIONS[id].code + " " + NATIONS[id].name + '</button>';
+    }).join("");
+
+    var outcomeBlock = m.revealed
+      ? '<div class="outcome"><span class="label">What actually happened</span>' + r.outcome + '</div>'
+      : "";
+
+    var finalHtml = "";
+    if (isLast && m.revealed) {
+      finalHtml =
+        '<hr class="rule thick">' +
+        '<h2>Where history landed</h2>' +
+        '<p>By 1914, these six powers had settled into two blocs:</p>' +
+        '<div class="final-blocs">' +
+          '<div class="bloc-box entente"><h4>The Triple Entente</h4>Great Britain &middot; France &middot; Russia</div>' +
+          '<div class="bloc-box central"><h4>The Central Powers</h4>Germany &middot; Austria-Hungary &middot; Ottoman Empire</div>' +
+        '</div>' +
+        '<p style="margin-top:1rem;">Compare that to the alliances your class actually formed. Where did your choices match history &mdash; and where did they diverge?</p>';
+    }
+
+    app.innerHTML =
+      '<div class="topbar">' +
+        '<button class="secondary" id="back-btn">&larr; Back</button>' +
+        '<span class="who">CLASS BOARD &mdash; SINGLE-DEVICE MODE</span>' +
+      '</div>' +
+      '<div class="masthead" style="margin-bottom:1rem;">' +
+        '<div class="kicker">A CLASSROOM DIPLOMATIC SIMULATION</div>' +
+        '<h1 style="font-size:clamp(1.6rem,4vw,2.2rem);">The Alliance System</h1>' +
+      '</div>' +
+      timelineHtml(m) +
+      '<div class="round-year">' + r.year + '</div>' +
+      '<h2 class="round-title">' + r.title + '</h2>' +
+      '<p>' + r.context + '</p>' +
+      '<p style="color:var(--ink-soft);"><em>' + r.prompt + '</em></p>' +
+      '<div class="picker" id="picker">' + chips + '</div>' +
+      '<div class="btn-row">' +
+        (m.revealed
+          ? '<button id="next-btn">' + (isLast ? "Restart game" : "Next round \u2192") + '</button>'
+          : '<button id="reveal-btn">Reveal what actually happened</button>') +
+        '<button class="secondary" id="reset-btn">Reset entire game</button>' +
+      '</div>' +
+      outcomeBlock +
+      finalHtml;
+
+    document.getElementById("back-btn").addEventListener("click", function(){
+      state.screen = "start";
+      render();
+      window.scrollTo(0,0);
+    });
+    document.getElementById("reset-btn").addEventListener("click", function(){
+      if (confirm("Reset the class board back to 1789? This clears all recorded alliances.")) {
+        safeSet(LS_MOD_STATE, JSON.stringify({ round: 0, revealed: false, picks: [], edges: [] }));
+        render();
+        window.scrollTo(0,0);
+      }
+    });
+
+    if (!m.revealed) {
+      Array.prototype.forEach.call(app.querySelectorAll(".chip"), function(chip){
+        chip.addEventListener("click", function(){
+          var id = chip.getAttribute("data-id");
+          var idx = m.picks.indexOf(id);
+          if (idx > -1) m.picks.splice(idx, 1); else m.picks.push(id);
+          saveModState(m);
+          renderModeratorLocal();
+        });
+      });
+      var revealBtn = document.getElementById("reveal-btn");
+      revealBtn.addEventListener("click", function(){
+        m.revealed = true;
+        if (m.picks.length >= 2) {
+          for (var i = 0; i < m.picks.length; i++) {
+            for (var j = i + 1; j < m.picks.length; j++) {
+              m.edges.push({ a: m.picks[i], b: m.picks[j], year: r.year });
+            }
+          }
+        }
+        saveModState(m);
+        renderModeratorLocal();
+      });
+    } else {
+      document.getElementById("next-btn").addEventListener("click", function(){
+        if (isLast) {
+          safeSet(LS_MOD_STATE, JSON.stringify({ round: 0, revealed: false, picks: [], edges: [] }));
+        } else {
+          m.round += 1;
+          m.revealed = false;
+          m.picks = [];
+          saveModState(m);
+        }
+        renderModeratorLocal();
+        window.scrollTo(0,0);
+      });
+    }
+  }
+
+  function buildGraphSvg(edges){
+    var w = 620, h = 360, cx = w/2, cy = h/2, radius = 135;
+    var positions = {};
+    ORDER.forEach(function(id, i){
+      var angle = (Math.PI * 2 * i / ORDER.length) - Math.PI/2;
+      positions[id] = { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
+    });
+
+    var lines = edges.map(function(e){
+      var p1 = positions[e.a], p2 = positions[e.b];
+      var mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+      return '<line x1="' + p1.x + '" y1="' + p1.y + '" x2="' + p2.x + '" y2="' + p2.y +
+        '" stroke="var(--brass)" stroke-width="2" opacity="0.85" />' +
+        '<text x="' + mx + '" y="' + my + '" font-size="9" fill="var(--ink-soft)" text-anchor="middle">' + e.year + '</text>';
+    }).join("");
+
+    var nodes = ORDER.map(function(id){
+      var p = positions[id];
+      var n = NATIONS[id];
+      return '<circle cx="' + p.x + '" cy="' + p.y + '" r="26" fill="var(--burgundy)" stroke="var(--parchment)" stroke-width="2" />' +
+        '<text x="' + p.x + '" y="' + (p.y + 4) + '" font-size="11" fill="var(--parchment-card)" text-anchor="middle" font-weight="700">' + n.code + '</text>' +
+        '<text x="' + p.x + '" y="' + (p.y + 42) + '" font-size="10" fill="var(--ink-soft)" text-anchor="middle">' + n.name + '</text>';
+    }).join("");
+
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;height:auto;max-height:420px;" role="img" aria-label="Alliance diagram">' +
+      lines + nodes + '</svg>';
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
