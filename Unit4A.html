@@ -158,12 +158,6 @@
     color: var(--ink-soft);
     margin-top: 0.15rem;
   }
-  .mod-card {
-    margin-top: 1.6rem;
-    background: transparent;
-    border: 1px dashed var(--brass);
-  }
-  .mod-card .seal { background: var(--brass); }
 
   /* Buttons */
   button {
@@ -232,7 +226,7 @@
   }
   .save-note { font-size: 0.78rem; color: var(--ink-soft); margin-top: 0.35rem; }
 
-  /* Moderator */
+  /* Round timeline */
   .timeline {
     display: flex;
     overflow-x: auto;
@@ -683,21 +677,11 @@
   ];
 
   var LS_NOTES_PREFIX = "alliance1914_notes_";
-  var LS_MOD_STATE = "alliance1914_moderator_state_v1";
 
   function safeGet(key){ try { return localStorage.getItem(key); } catch(e){ return null; } }
   function safeSet(key, val){ try { localStorage.setItem(key, val); } catch(e){} }
 
   var state = { screen: "start" };
-
-  function loadModState(){
-    var raw = safeGet(LS_MOD_STATE);
-    if (raw) {
-      try { return JSON.parse(raw); } catch(e) {}
-    }
-    return { round: 0, revealed: false, picks: [], edges: [] };
-  }
-  function saveModState(m){ safeSet(LS_MOD_STATE, JSON.stringify(m)); }
 
   // ---- Live shared game state (db capability), with single-device fallback ----
   var dbCap = null;
@@ -724,7 +708,7 @@
   }
 
   function rerenderIfLive(){
-    if (state.screen === "nation" || state.screen === "moderator") render();
+    if (state.screen === "nation") render();
   }
 
   function initDb(){
@@ -844,7 +828,6 @@
   function render(){
     if (state.screen === "start") renderStart();
     else if (state.screen === "nation") renderNation(state.nationId);
-    else if (state.screen === "moderator") renderModerator();
   }
 
   function el(html){
@@ -879,11 +862,7 @@
       '<p>Each player selects their nation on their own laptop and reads their private brief. Negotiate with your classmates &mdash; in person or in chat &mdash; then record your own nation\u2019s alignment each round. The alliance web updates live for everyone.</p>' +
       '<hr class="rule">' +
       '<h3 style="font-family:\'Courier Prime\',monospace;font-size:0.85rem;letter-spacing:0.08em;color:var(--brass);text-transform:uppercase;">Choose your power</h3>' +
-      '<div class="nation-grid">' + cards + '</div>' +
-      '<button class="nation-card mod-card" id="mod-btn">' +
-        '<span class="seal">CB</span>' +
-        '<span><span class="name">Class Board</span><br><span class="sub">A shared, no-nation view of the timeline &amp; alliance web</span></span>' +
-      '</button>';
+      '<div class="nation-grid">' + cards + '</div>';
 
     Array.prototype.forEach.call(app.querySelectorAll(".nation-card[data-nation]"), function(btn){
       btn.addEventListener("click", function(){
@@ -893,11 +872,6 @@
         window.scrollTo(0,0);
       });
     });
-    document.getElementById("mod-btn").addEventListener("click", function(){
-      state.screen = "moderator";
-      render();
-      window.scrollTo(0,0);
-    });
   }
 
   function buildLiveRoundPanel(myId){
@@ -905,7 +879,7 @@
       return '<div class="panel"><h3>Class negotiation</h3><p style="margin:0;color:var(--ink-soft);">Connecting to the shared game board&hellip;</p></div>';
     }
     if (dbState === "unavailable" || !shared) {
-      return '<div class="panel"><h3>Class negotiation</h3><p style="margin:0;color:var(--ink-soft);">Live sync isn\u2019t available in this view. Play this game through its published Claude link, shared with your classmates, so everyone\u2019s laptop stays in sync &mdash; or have one device run the Class Board for the whole class instead.</p></div>';
+      return '<div class="panel"><h3>Class negotiation</h3><p style="margin:0;color:var(--ink-soft);">Live sync isn\u2019t available in this view. Play this game through its published Claude link, shared with your classmates, so everyone\u2019s laptop stays in sync.</p></div>';
     }
     var m = shared;
     var baseRound = ROUNDS[m.round];
@@ -994,6 +968,24 @@
       ? '<div class="outcome"><span class="label">What actually happened</span>' + r.outcome + '</div>'
       : "";
 
+    var summaryBlock = "";
+    if (m.revealed) {
+      var allies = [], atWar = [], declinedOrEnded = [];
+      ORDER.forEach(function(id){
+        if (id === myId) return;
+        var st = otherInfo[id].status;
+        if (st === "accepted") allies.push(NATIONS[id].name);
+        else if (st === "war") atWar.push(NATIONS[id].name);
+        else if (st === "declined" || st === "ended") declinedOrEnded.push(NATIONS[id].name);
+      });
+      summaryBlock = '<div class="panel"><h3>Your standing after this round</h3>' +
+        '<p style="margin:0 0 0.5em;"><strong>Allied with:</strong> ' + (allies.length ? allies.join(", ") : "No one") + '</p>' +
+        '<p style="margin:0 0 0.5em;"><strong>At war with:</strong> ' + (atWar.length ? atWar.join(", ") : "No one") + '</p>' +
+        (declinedOrEnded.length ? ('<p style="margin:0 0 0.5em;"><strong>No alliance with:</strong> ' + declinedOrEnded.join(", ") + '</p>') : "") +
+        (iAmNeutral ? '<p style="margin:0;"><strong>You declared neutrality this round.</strong></p>' : "") +
+      '</div>';
+    }
+
     var finalBlock = "";
     if (isLast && m.revealed) {
       finalBlock =
@@ -1017,6 +1009,7 @@
       '<div class="btn-row">' + controlsHtml + '</div>' +
       outcomeBlock +
     '</div>' +
+    summaryBlock +
     elsewhereHtml +
     finalBlock;
   }
@@ -1072,230 +1065,6 @@
       var nextBtn = document.getElementById("next-live-btn");
       if (nextBtn) nextBtn.addEventListener("click", function(){ nextRound(); window.scrollTo(0,0); });
     }
-  }
-
-  function renderModerator(){
-    var usingLive = (dbState === "live" && !!shared);
-
-    if (dbState === "pending") {
-      app.innerHTML =
-        '<div class="topbar"><button class="secondary" id="back-btn">&larr; Back</button><span class="who">CLASS BOARD</span></div>' +
-        '<div class="masthead" style="margin-bottom:1rem;"><div class="kicker">A CLASSROOM DIPLOMATIC SIMULATION</div><h1 style="font-size:clamp(1.6rem,4vw,2.2rem);">The Alliance System</h1></div>' +
-        '<p style="color:var(--ink-soft);">Connecting to the shared game board&hellip;</p>';
-      document.getElementById("back-btn").addEventListener("click", function(){ state.screen = "start"; render(); window.scrollTo(0,0); });
-      return;
-    }
-
-    if (usingLive) { renderModeratorLive(); } else { renderModeratorLocal(); }
-  }
-
-  function renderModeratorLive(){
-    var m = shared;
-    var r = ROUNDS[m.round];
-    var isLast = m.round === ROUNDS.length - 1;
-
-    var relRows = Object.keys(m.relations).map(function(k){
-      var rel = m.relations[k];
-      var label = { accepted: "allied", declined: "declined", ended: "alliance ended", war: "at war", peace: "at peace", pending: "pending" }[rel.status] || rel.status;
-      return '<li>' + NATIONS[rel.from].code + ' \u2194 ' + NATIONS[rel.to].code + ' &mdash; ' + label + '</li>';
-    });
-    var neutralRows = ORDER.filter(function(id){ return m.neutral[id]; }).map(function(id){
-      return '<li>' + NATIONS[id].code + ' has declared neutrality</li>';
-    });
-    var reqRows = relRows.concat(neutralRows).join("");
-    var reqBlock = (!m.revealed)
-      ? ('<div class="panel"><h3>This round\u2019s diplomacy</h3>' +
-          (reqRows ? ('<ul class="elsewhere-list">' + reqRows + '</ul>') : '<p style="margin:0;color:var(--ink-soft);">No moves yet this round.</p>') +
-        '</div>')
-      : "";
-
-    var outcomeBlock = m.revealed
-      ? '<div class="outcome"><span class="label">What actually happened</span>' + r.outcome + '</div>'
-      : "";
-
-    var finalHtml = "";
-    if (isLast && m.revealed) {
-      finalHtml =
-        '<hr class="rule thick">' +
-        '<h2>Where history landed</h2>' +
-        '<p>By 1914, these six powers had settled into two blocs:</p>' +
-        '<div class="final-blocs">' +
-          '<div class="bloc-box entente"><h4>The Triple Entente</h4>Great Britain &middot; France &middot; Russia</div>' +
-          '<div class="bloc-box central"><h4>The Central Powers</h4>Germany &middot; Austria-Hungary &middot; Ottoman Empire</div>' +
-        '</div>' +
-        '<p style="margin-top:1rem;">Compare that to the alliances and wars your class actually formed. Where did your choices match history &mdash; and where did they diverge?</p>';
-    }
-
-    app.innerHTML =
-      '<div class="topbar">' +
-        '<button class="secondary" id="back-btn">&larr; Back</button>' +
-        '<span class="who">CLASS BOARD &mdash; LIVE</span>' +
-      '</div>' +
-      '<div class="masthead" style="margin-bottom:1rem;">' +
-        '<div class="kicker">A CLASSROOM DIPLOMATIC SIMULATION</div>' +
-        '<h1 style="font-size:clamp(1.6rem,4vw,2.2rem);">The Alliance System</h1>' +
-      '</div>' +
-      timelineHtml(m) +
-      '<div class="round-year">' + r.year + '</div>' +
-      '<h2 class="round-title">' + r.title + '</h2>' +
-      '<p>' + r.context + '</p>' +
-      '<p style="color:var(--ink-soft);"><em>' + r.prompt + '</em></p>' +
-      '<p style="color:var(--ink-soft);font-size:0.9rem;">Players propose and accept alliances from their own nation screens. This board shows the shared result.</p>' +
-      reqBlock +
-      '<div class="btn-row">' +
-        (m.revealed
-          ? '<button id="next-btn">' + (isLast ? "Restart game" : "Next round \u2192") + '</button>'
-          : '<button id="reveal-btn">Reveal what actually happened</button>') +
-        '<button class="secondary" id="reset-btn">Reset entire game</button>' +
-      '</div>' +
-      outcomeBlock +
-      finalHtml;
-
-    document.getElementById("back-btn").addEventListener("click", function(){
-      state.screen = "start"; render(); window.scrollTo(0,0);
-    });
-    document.getElementById("reset-btn").addEventListener("click", function(){
-      if (confirm("Reset the class board back to 1789? This clears all recorded alliances for everyone.")) {
-        resetShared();
-        window.scrollTo(0,0);
-      }
-    });
-    if (!m.revealed) {
-      document.getElementById("reveal-btn").addEventListener("click", function(){ revealRound(); });
-    } else {
-      document.getElementById("next-btn").addEventListener("click", function(){ nextRound(); window.scrollTo(0,0); });
-    }
-  }
-
-  function renderModeratorLocal(){
-    var m = loadModState();
-    var r = ROUNDS[m.round];
-    var isLast = m.round === ROUNDS.length - 1;
-
-    var chips = ORDER.map(function(id){
-      var sel = m.picks.indexOf(id) > -1;
-      return '<button class="chip' + (sel ? " selected" : "") + '" data-id="' + id + '">' + NATIONS[id].code + " " + NATIONS[id].name + '</button>';
-    }).join("");
-
-    var outcomeBlock = m.revealed
-      ? '<div class="outcome"><span class="label">What actually happened</span>' + r.outcome + '</div>'
-      : "";
-
-    var finalHtml = "";
-    if (isLast && m.revealed) {
-      finalHtml =
-        '<hr class="rule thick">' +
-        '<h2>Where history landed</h2>' +
-        '<p>By 1914, these six powers had settled into two blocs:</p>' +
-        '<div class="final-blocs">' +
-          '<div class="bloc-box entente"><h4>The Triple Entente</h4>Great Britain &middot; France &middot; Russia</div>' +
-          '<div class="bloc-box central"><h4>The Central Powers</h4>Germany &middot; Austria-Hungary &middot; Ottoman Empire</div>' +
-        '</div>' +
-        '<p style="margin-top:1rem;">Compare that to the alliances your class actually formed. Where did your choices match history &mdash; and where did they diverge?</p>';
-    }
-
-    app.innerHTML =
-      '<div class="topbar">' +
-        '<button class="secondary" id="back-btn">&larr; Back</button>' +
-        '<span class="who">CLASS BOARD &mdash; SINGLE-DEVICE MODE</span>' +
-      '</div>' +
-      '<div class="masthead" style="margin-bottom:1rem;">' +
-        '<div class="kicker">A CLASSROOM DIPLOMATIC SIMULATION</div>' +
-        '<h1 style="font-size:clamp(1.6rem,4vw,2.2rem);">The Alliance System</h1>' +
-      '</div>' +
-      timelineHtml(m) +
-      '<div class="round-year">' + r.year + '</div>' +
-      '<h2 class="round-title">' + r.title + '</h2>' +
-      '<p>' + r.context + '</p>' +
-      '<p style="color:var(--ink-soft);"><em>' + r.prompt + '</em></p>' +
-      '<div class="picker" id="picker">' + chips + '</div>' +
-      '<div class="btn-row">' +
-        (m.revealed
-          ? '<button id="next-btn">' + (isLast ? "Restart game" : "Next round \u2192") + '</button>'
-          : '<button id="reveal-btn">Reveal what actually happened</button>') +
-        '<button class="secondary" id="reset-btn">Reset entire game</button>' +
-      '</div>' +
-      outcomeBlock +
-      finalHtml;
-
-    document.getElementById("back-btn").addEventListener("click", function(){
-      state.screen = "start";
-      render();
-      window.scrollTo(0,0);
-    });
-    document.getElementById("reset-btn").addEventListener("click", function(){
-      if (confirm("Reset the class board back to 1789? This clears all recorded alliances.")) {
-        safeSet(LS_MOD_STATE, JSON.stringify({ round: 0, revealed: false, picks: [], edges: [] }));
-        render();
-        window.scrollTo(0,0);
-      }
-    });
-
-    if (!m.revealed) {
-      Array.prototype.forEach.call(app.querySelectorAll(".chip"), function(chip){
-        chip.addEventListener("click", function(){
-          var id = chip.getAttribute("data-id");
-          var idx = m.picks.indexOf(id);
-          if (idx > -1) m.picks.splice(idx, 1); else m.picks.push(id);
-          saveModState(m);
-          renderModeratorLocal();
-        });
-      });
-      var revealBtn = document.getElementById("reveal-btn");
-      revealBtn.addEventListener("click", function(){
-        m.revealed = true;
-        if (m.picks.length >= 2) {
-          for (var i = 0; i < m.picks.length; i++) {
-            for (var j = i + 1; j < m.picks.length; j++) {
-              m.edges.push({ a: m.picks[i], b: m.picks[j], year: r.year });
-            }
-          }
-        }
-        saveModState(m);
-        renderModeratorLocal();
-      });
-    } else {
-      document.getElementById("next-btn").addEventListener("click", function(){
-        if (isLast) {
-          safeSet(LS_MOD_STATE, JSON.stringify({ round: 0, revealed: false, picks: [], edges: [] }));
-        } else {
-          m.round += 1;
-          m.revealed = false;
-          m.picks = [];
-          saveModState(m);
-        }
-        renderModeratorLocal();
-        window.scrollTo(0,0);
-      });
-    }
-  }
-
-  function buildGraphSvg(edges){
-    var w = 620, h = 360, cx = w/2, cy = h/2, radius = 135;
-    var positions = {};
-    ORDER.forEach(function(id, i){
-      var angle = (Math.PI * 2 * i / ORDER.length) - Math.PI/2;
-      positions[id] = { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
-    });
-
-    var lines = edges.map(function(e){
-      var p1 = positions[e.a], p2 = positions[e.b];
-      var mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
-      return '<line x1="' + p1.x + '" y1="' + p1.y + '" x2="' + p2.x + '" y2="' + p2.y +
-        '" stroke="var(--brass)" stroke-width="2" opacity="0.85" />' +
-        '<text x="' + mx + '" y="' + my + '" font-size="9" fill="var(--ink-soft)" text-anchor="middle">' + e.year + '</text>';
-    }).join("");
-
-    var nodes = ORDER.map(function(id){
-      var p = positions[id];
-      var n = NATIONS[id];
-      return '<circle cx="' + p.x + '" cy="' + p.y + '" r="26" fill="var(--burgundy)" stroke="var(--parchment)" stroke-width="2" />' +
-        '<text x="' + p.x + '" y="' + (p.y + 4) + '" font-size="11" fill="var(--parchment-card)" text-anchor="middle" font-weight="700">' + n.code + '</text>' +
-        '<text x="' + p.x + '" y="' + (p.y + 42) + '" font-size="10" fill="var(--ink-soft)" text-anchor="middle">' + n.name + '</text>';
-    }).join("");
-
-    return '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;height:auto;max-height:420px;" role="img" aria-label="Alliance diagram">' +
-      lines + nodes + '</svg>';
   }
 
   render();
