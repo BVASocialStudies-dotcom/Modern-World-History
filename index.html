@@ -194,7 +194,7 @@
     <div class="compass">✦</div>
     <div class="eyebrow">10th Grade · Modern World History</div>
     <h1>Course Hub</h1>
-    <p>Eight units, three activities each. Click any lit-up activity to launch it — new activities will light up here as they're added throughout the year.</p>
+    <p>Eight units, four activities each. Click any lit-up activity to launch it — new activities will light up here as they're added throughout the year.</p>
   </div>
 
   <div class="legend">
@@ -273,7 +273,7 @@ const UNITS = [
 function renderUnits(){
   const grid = document.getElementById('grid');
   grid.innerHTML = UNITS.map(u=>{
-    const acts = [0,1,2].map(i=>{
+    const acts = [0,1,2,3].map(i=>{
       const override = (u.activities && u.activities[i]) || {};
       const ready = !!override.ready;
       const label = `Activity ${i+1}`;
