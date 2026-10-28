@@ -178,6 +178,12 @@
   .event.pop { animation: pop .35s ease-out; }
   @keyframes pop { from { transform: scale(.94); opacity: .3; } to { transform: none; opacity: 1; } }
   .prompt { margin: .4rem 0 0; color: var(--paper-dim); font-style: italic; font-size: 1rem; }
+  .prompt.good { color: var(--ember); font-style: normal; font-weight: bold; }
+  .prompt.bad { color: #ff8a8a; font-style: normal; font-weight: bold; }
+  .next { margin-top: .75rem; font-size: 1.3rem; padding: .55rem 1.8rem; }
+  .next[hidden] { display: none; }
+  .bank button.dim { opacity: .35; pointer-events: none; }
+  .bank button.picked { border: 2px solid var(--paper); background: rgba(247,230,212,.16); }
 
   .bank {
     list-style: none; padding: 0; margin: 1.5rem 0 0;
@@ -233,7 +239,7 @@
 
     <div class="play">
       <h2>How to play</h2>
-      <p>Events pop up one at a time, each with six possible descriptions. Pick the correct one to move on to the next event. The clock is running the whole time.</p>
+      <p>Events pop up one at a time, each with six possible descriptions. Pick the correct one, record it on your paper, and click Next Event. A wrong pick restarts the round with new choices. The clock is running the whole time.</p>
       <button class="start" id="startBtn" type="button">Start the game</button>
     </div>
   </section>
@@ -246,7 +252,8 @@
         <span class="clock" id="clock" aria-label="Time">0:00</span>
       </div>
       <h2 class="event" id="event" aria-live="polite"></h2>
-      <p class="prompt">Click the description that matches this event.</p>
+      <p class="prompt" id="status" aria-live="polite">Click the description that matches this event.</p>
+      <button class="start next" id="nextBtn" type="button" hidden>Next Event</button>
     </div>
     <ul class="bank" id="bank"></ul>
   </section>
@@ -370,6 +377,7 @@
   }
 
   function buildBank() {
+    resetRound();
     bank.innerHTML = '';
     // Six choices: the correct description plus five random other descriptions
     var CHOICES = 6;
@@ -386,25 +394,51 @@
     });
   }
 
+  var statusEl = document.getElementById('status');
+  var nextBtn = document.getElementById('nextBtn');
+
+  function resetRound() {
+    locked = false;
+    nextBtn.hidden = true;
+    statusEl.className = 'prompt';
+    statusEl.textContent = 'Click the description that matches this event.';
+  }
+
+  function dimOthers(keep) {
+    Array.prototype.forEach.call(bank.querySelectorAll('button'), function (x) {
+      if (x !== keep) x.classList.add('dim');
+    });
+  }
+
+  var lastCorrect = false;
+
   function choose(ev) {
-    if (locked) return;
     var b = ev.currentTarget;
-    if (+b.dataset.idx === current) {
-      locked = true;
-      b.classList.add('right');
-      setTimeout(function () {
-        b.parentNode.remove();
-        current++;
-        locked = false;
-        if (current >= EVENTS.length) finishGame(); else showEvent();
-      }, 350);
+    // Students can change their pick until they click Next Event
+    Array.prototype.forEach.call(bank.querySelectorAll('button'), function (x) {
+      x.classList.toggle('picked', x === b);
+    });
+    // Same look either way, so the screen doesn't reveal the answer before the teacher check
+    lastCorrect = (+b.dataset.idx === current);
+    statusEl.className = 'prompt good';
+    statusEl.textContent = 'Write your choice on your notecard and check with Mr. McBride.';
+    nextBtn.textContent = 'Next Event';
+    nextBtn.hidden = false;
+  }
+
+  nextBtn.addEventListener('click', function () {
+    if (lastCorrect) {
+      current++;
+      if (current >= EVENTS.length) { finishGame(); return; }
+      showEvent();
     } else {
+      // Wrong final choice: count a miss and restart the round with new choices
       misses++;
       missesEl.textContent = misses;
-      b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong');
-      setTimeout(function () { b.classList.remove('wrong'); }, 600);
+      buildBank();
     }
-  }
+    window.scrollTo(0, 0);
+  });
 
   function startGame() {
     current = 0; misses = 0; locked = false;
