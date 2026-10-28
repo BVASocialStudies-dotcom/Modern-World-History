@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>We Didn’t Start the Fire: The Matching Game</title>
+<style>
+  :root {
+    --char: #1c0306;
+    --blood: #4a0710;
+    --crimson: #9e1420;
+    --flame: #ff5b1f;
+    --ember: #ffb347;
+    --paper: #f7e6d4;
+    --paper-dim: #d9b9a3;
+    color-scheme: dark;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --char: #1c0306; --blood: #4a0710; --paper: #f7e6d4; }
+  }
+  :root[data-theme="dark"] { --char: #1c0306; --blood: #4a0710; --paper: #f7e6d4; }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 120% 60% at 50% 115%, rgba(255,91,31,.55), transparent 60%),
+      linear-gradient(180deg, var(--char) 0%, var(--blood) 55%, var(--crimson) 100%);
+    background-color: var(--blood);
+    background-attachment: fixed;
+    color: var(--paper);
+    font-family: Georgia, "Times New Roman", serif;
+    line-height: 1.65;
+  }
+
+  main {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 3rem) 4rem;
+  }
+
+  /* ---------- Title ---------- */
+  .title {
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", "Franklin Gothic Bold", sans-serif;
+    font-weight: 400;
+    font-size: clamp(3.2rem, 11vw, 7.5rem);
+    line-height: .88;
+    letter-spacing: .01em;
+    text-transform: uppercase;
+    margin: 0;
+    color: var(--paper);
+    text-shadow: 0 0 .35em rgba(255,91,31,.45), 0 .04em 0 var(--char);
+  }
+  .byline {
+    margin: 1rem 0 0;
+    font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+    color: var(--ember);
+    font-style: italic;
+  }
+
+  /* ---------- The year strip: the one memorable moment ---------- */
+  .years {
+    margin: clamp(2rem, 5vw, 3rem) 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(3.3rem, 1fr));
+    gap: .3rem;
+    padding: 0;
+    list-style: none;
+  }
+  .years li {
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    font-size: 1.05rem;
+    text-align: center;
+    padding: .35rem 0;
+    border: 1px solid rgba(247,230,212,.14);
+    color: rgba(247,230,212,.35);
+    transition: color .25s, background-color .25s, border-color .25s;
+  }
+  .years li.lit {
+    color: var(--paper);
+    border-color: rgba(255,91,31,.6);
+    background: rgba(255,91,31,.18);
+  }
+  .years li.flash {
+    color: var(--char);
+    background: var(--ember);
+    border-color: var(--ember);
+  }
+  .years li.endpoint {
+    color: var(--char);
+    background: var(--flame);
+    border-color: var(--flame);
+  }
+
+  /* ---------- Story ---------- */
+  .story {
+    max-width: 38rem;
+    font-size: clamp(1.08rem, 1.9vw, 1.22rem);
+  }
+  .story p { margin: 0 0 1.1em; }
+  .story p:first-child::first-letter {
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    float: left;
+    font-size: 3.6em;
+    line-height: .85;
+    padding: .06em .12em 0 0;
+    color: var(--flame);
+  }
+
+  /* ---------- How to play + start ---------- */
+  .play {
+    margin-top: 2.5rem;
+    padding: 1.5rem clamp(1.25rem, 3vw, 2rem);
+    border-left: 4px solid var(--flame);
+    background: rgba(28,3,6,.55);
+    max-width: 38rem;
+  }
+  .play h2 {
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    font-weight: 400;
+    font-size: 1.6rem;
+    margin: 0 0 .5rem;
+    color: var(--ember);
+  }
+  .play p { margin: 0 0 1.25rem; color: var(--paper-dim); }
+  .start {
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: .03em;
+    padding: .7rem 2.2rem;
+    border: none;
+    background: var(--flame);
+    color: var(--char);
+    cursor: pointer;
+    box-shadow: 0 0 0 0 rgba(255,91,31,.6);
+    transition: transform .12s, box-shadow .2s, background-color .2s;
+  }
+  .start:hover { background: var(--ember); box-shadow: 0 0 1.5rem .2rem rgba(255,91,31,.45); }
+  .start:active { transform: translateY(2px); }
+  .start:focus-visible, .back:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
+
+  /* ---------- Game screen ---------- */
+  #game, #done { display: none; }
+  #game.show, #done.show { display: block; }
+  #home.hide { display: none; }
+
+  .hud {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 5;
+    background: var(--char);
+    border-bottom: 3px solid var(--flame);
+    margin: 0 calc(-1 * clamp(1.25rem, 5vw, 3rem));
+    padding: 1rem clamp(1.25rem, 5vw, 3rem) 1.25rem;
+  }
+  body.playing::before {
+    content: ""; position: fixed; inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--char);
+  }
+  .stats {
+    display: flex; justify-content: space-between; gap: 1rem;
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    font-size: 1.15rem; color: var(--paper-dim);
+  }
+  .stats .clock { color: var(--ember); font-variant-numeric: tabular-nums; }
+  .event {
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    font-size: clamp(2.2rem, 7vw, 4rem);
+    line-height: 1;
+    margin: .5rem 0 0;
+    color: var(--paper);
+    text-shadow: 0 0 .35em rgba(255,91,31,.45);
+  }
+  .event.pop { animation: pop .35s ease-out; }
+  @keyframes pop { from { transform: scale(.94); opacity: .3; } to { transform: none; opacity: 1; } }
+  .prompt { margin: .4rem 0 0; color: var(--paper-dim); font-style: italic; font-size: 1rem; }
+
+  .bank {
+    list-style: none; padding: 0; margin: 1.5rem 0 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: .6rem;
+  }
+  .bank button {
+    width: 100%; height: 100%;
+    text-align: left; font: inherit; font-size: 1.05rem; line-height: 1.5;
+    color: var(--paper);
+    background: rgba(28,3,6,.6);
+    border: 1px solid rgba(247,230,212,.2);
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    transition: border-color .15s, background-color .15s;
+  }
+  .bank button:hover { border-color: var(--ember); background: rgba(74,7,16,.9); }
+  .bank button:focus-visible { outline: 3px solid var(--paper); outline-offset: 2px; }
+  .bank button.wrong { border-color: #ff2b2b; background: rgba(255,43,43,.3); animation: shake .35s; }
+  .bank button.right { border-color: var(--ember); background: var(--ember); color: var(--char); }
+  @keyframes shake { 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-3px); } }
+
+  .final { font-size: clamp(1.1rem, 2vw, 1.3rem); max-width: 38rem; }
+  .final strong { color: var(--ember); font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif; font-weight: 400; font-size: 1.4em; }
+  .back {
+    font: inherit;
+    background: none;
+    border: 1px solid var(--paper-dim);
+    color: var(--paper);
+    padding: .5rem 1.2rem;
+    cursor: pointer;
+    margin: 1.5rem .75rem 0 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .years li, .start, .bank button { transition: none; }
+    .event.pop, .bank button.wrong { animation: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <section id="home">
+    <h1 class="title">We Didn’t<br>Start the Fire</h1>
+    <p class="byline">Billy Joel, 1989: forty years of history at rapid fire</p>
+
+    <ol class="years" id="years" aria-label="The years covered by the song, 1949 to 1989"></ol>
+
+    <div class="story">
+      <p>This monster hit of a song was created in 1989, when Joel turned 40. The idea spawned from a conversation he had with a friend. The friend just turned 21 and was complaining about how crazy it was to be living in his era, therefore undermining any other time before his.</p>
+      <p>This encouraged Joel to write a song that would prove that any time is filled with extremes. Starting from 1949 (the year in which he was born), he chronicled the major events that occurred during that time in a rapid fire delivery of names, places, and cultural works.</p>
+    </div>
+
+    <div class="play">
+      <h2>How to play</h2>
+      <p>Events pop up one at a time, each with six possible descriptions. Pick the correct one to move on to the next event. The clock is running the whole time.</p>
+      <button class="start" id="startBtn" type="button">Start the game</button>
+    </div>
+  </section>
+
+  <section id="game">
+    <div class="hud">
+      <div class="stats">
+        <span id="progress">Event 1 of 30</span>
+        <span>Misses: <span id="misses">0</span></span>
+        <span class="clock" id="clock" aria-label="Time">0:00</span>
+      </div>
+      <h2 class="event" id="event" aria-live="polite"></h2>
+      <p class="prompt">Click the description that matches this event.</p>
+    </div>
+    <ul class="bank" id="bank"></ul>
+  </section>
+
+  <section id="done">
+    <h2 class="title" style="font-size:clamp(2.6rem,8vw,5rem)">You made it<br>to 1989</h2>
+    <div class="final">
+      <p>Total time: <strong id="finalTime">0:00</strong></p>
+      <p>Misses: <strong id="finalMisses">0</strong></p>
+    </div>
+    <button class="start" id="againBtn" type="button">Play again</button>
+    <button class="back" id="homeBtn" type="button">Back to home</button>
+  </section>
+</main>
+
+<script>
+(function () {
+  var list = document.getElementById('years');
+  var items = [];
+  for (var y = 1949; y <= 1989; y++) {
+    var li = document.createElement('li');
+    li.textContent = y;
+    list.appendChild(li);
+    items.push(li);
+  }
+  var first = items[0], last = items[items.length - 1];
+
+  function finish() {
+    items.forEach(function (li) { li.classList.add('lit'); li.classList.remove('flash'); });
+    first.classList.add('endpoint');
+    last.classList.add('endpoint');
+  }
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) {
+    finish();
+  } else {
+    // Rapid-fire run through the years, like the song's delivery
+    var i = 0;
+    setTimeout(function step() {
+      if (i > 0) { items[i - 1].classList.remove('flash'); items[i - 1].classList.add('lit'); }
+      if (i < items.length) {
+        items[i].classList.add('flash');
+        i++;
+        setTimeout(step, 55);
+      } else {
+        finish();
+      }
+    }, 400);
+  }
+
+  // ---------- Events and descriptions (in song order) ----------
+  // Replace each "desc" with Shane's description.
+  var EVENTS = [
+    { name: "Red China", desc: "The Communists, under Mao Zedong, won the Chinese Civil War and established the People's Republic of China." },
+    { name: "Television", desc: "Over 12 million Americans owned TVs by 1951." },
+    { name: "North Korea / South Korea", desc: "The Soviet-backed North invaded the US-backed South, beginning a war in 1950." },
+    { name: "H-Bomb", desc: "The United States successfully tested the world's first thermonuclear bomb, code named Ivy Mike." },
+    { name: "Vaccine", desc: "Jonas Salk had successfully found a cure to polio." },
+    { name: "Queen Elizabeth II", desc: "Took the throne of England in 1953 after the death of her father." },
+    { name: "Joseph Stalin", desc: "Died in 1953 after 25 years of dictatorial rule over the Soviet Union." },
+    { name: "Gamal Abdel Nasser", desc: "Ousted the monarchy in Egypt in a nearly bloodless coup." },
+    { name: "Communist Bloc", desc: "Communist nations in Eastern Europe formed the Warsaw Pact." },
+    { name: "Juan Perón", desc: "Leader of Argentina who brought industrialization to the country." },
+    { name: "Dien Bien Phu Falls", desc: "The Viet Minh defeat the French, ending the First Indochina War." },
+    { name: "Albert Einstein", desc: "The famed physicist who developed the theory of relativity died in 1955." },
+    { name: "Budapest", desc: "The Hungarian Revolution against Soviet rule was ended after the Soviet military invaded." },
+    { name: "Nikita Khrushchev", desc: "Pushed for de-Stalinization in the Soviet Union and better relations with the United States." },
+    { name: "Trouble in the Suez", desc: "The UK, France, and Israel invaded Egypt after Gamal Abdel Nasser nationalized the canal." },
+    { name: "Sputnik", desc: "The Soviet Union launched the first satellite into orbit in 1957." },
+    { name: "Lebanon", desc: "The US occupied the nation for 5 months after an insurrection threatened to overthrow the president." },
+    { name: "Charles de Gaulle", desc: "The former leader of the French Resistance became the president of France." },
+    { name: "Space Monkey", desc: "Able and Baker became the first primates to return from orbit alive after being shot into space by the United States." },
+    { name: "Fidel Castro", desc: "Became the leader of Cuba after leading a revolution that overthrew the US-backed dictator Fulgencio Batista." },
+    { name: "U-2", desc: "An American reconnaissance plane was shot down over the Soviet Union." },
+    { name: "Belgians in the Congo", desc: "The Democratic Republic of the Congo gained its independence in 1960." },
+    { name: "Adolf Eichmann", desc: "The former Nazi official was captured in Argentina and put on trial for war crimes in Israel." },
+    { name: "Berlin Wall", desc: "The government of East Germany built the structure to keep people from fleeing to the west." },
+    { name: "Ho Chi Minh", desc: "The leader of Vietnam died in 1969, which damaged chances for an early end to the Vietnam War." },
+    { name: "Palestine", desc: "US President Jimmy Carter hosted the Camp David Accords." },
+    { name: "Ayatollahs in Iran", desc: "The 1979 revolution overthrew the US-backed Shah and installed a strict theocracy." },
+    { name: "Russians in Afghanistan", desc: "The Soviet Union invaded the neighboring country in support of its communist government." },
+    { name: "AIDS", desc: "The CDC first identified the virus in 1981." },
+    { name: "China’s Under Martial Law", desc: "Student protests at Tiananmen Square led to a violent crackdown and martial law being declared nationwide." }
+  ];
+  EVENTS.forEach(function (e, i) {
+    if (!e.desc) e.desc = "Description #" + (i + 1) + " coming soon (" + e.name + ")";
+  });
+
+  var home = document.getElementById('home');
+  var game = document.getElementById('game');
+  var done = document.getElementById('done');
+  var bank = document.getElementById('bank');
+  var eventEl = document.getElementById('event');
+  var progressEl = document.getElementById('progress');
+  var missesEl = document.getElementById('misses');
+  var clockEl = document.getElementById('clock');
+
+  var current = 0, misses = 0, startTime = 0, timerId = null, locked = false;
+
+  function fmt(ms) {
+    var t = Math.floor(ms / 1000);
+    var m = Math.floor(t / 60), sec = t % 60;
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+  function tick() { clockEl.textContent = fmt(Date.now() - startTime); }
+
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function showEvent() {
+    eventEl.textContent = EVENTS[current].name;
+    progressEl.textContent = 'Event ' + (current + 1) + ' of ' + EVENTS.length;
+    eventEl.classList.remove('pop'); void eventEl.offsetWidth; eventEl.classList.add('pop');
+    buildBank();
+  }
+
+  function buildBank() {
+    bank.innerHTML = '';
+    // Six choices: the correct description plus five random other descriptions
+    var CHOICES = 6;
+    var others = shuffle(EVENTS.map(function (e, i) { return i; }).filter(function (i) { return i !== current; }));
+    shuffle([current].concat(others.slice(0, CHOICES - 1))).forEach(function (idx) {
+      var li = document.createElement('li');
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = EVENTS[idx].desc;
+      b.dataset.idx = idx;
+      b.addEventListener('click', choose);
+      li.appendChild(b);
+      bank.appendChild(li);
+    });
+  }
+
+  function choose(ev) {
+    if (locked) return;
+    var b = ev.currentTarget;
+    if (+b.dataset.idx === current) {
+      locked = true;
+      b.classList.add('right');
+      setTimeout(function () {
+        b.parentNode.remove();
+        current++;
+        locked = false;
+        if (current >= EVENTS.length) finishGame(); else showEvent();
+      }, 350);
+    } else {
+      misses++;
+      missesEl.textContent = misses;
+      b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong');
+      setTimeout(function () { b.classList.remove('wrong'); }, 600);
+    }
+  }
+
+  function startGame() {
+    current = 0; misses = 0; locked = false;
+    missesEl.textContent = '0';
+    clockEl.textContent = '0:00';
+    showEvent();
+    home.classList.add('hide');
+    done.classList.remove('show');
+    game.classList.add('show');
+    document.body.classList.add('playing');
+    window.scrollTo(0, 0);
+    startTime = Date.now();
+    clearInterval(timerId);
+    timerId = setInterval(tick, 250);
+  }
+
+  function finishGame() {
+    clearInterval(timerId);
+    var total = Date.now() - startTime;
+    document.getElementById('finalTime').textContent = fmt(total);
+    document.getElementById('finalMisses').textContent = misses;
+    game.classList.remove('show');
+    document.body.classList.remove('playing');
+    done.classList.add('show');
+    window.scrollTo(0, 0);
+    document.getElementById('againBtn').focus();
+  }
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('againBtn').addEventListener('click', startGame);
+  document.getElementById('homeBtn').addEventListener('click', function () {
+    done.classList.remove('show');
+    home.classList.remove('hide');
+    window.scrollTo(0, 0);
+    document.getElementById('startBtn').focus();
+  });
+})();
+</script>
+</body>
+</html>
