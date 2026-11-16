@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cold War Interventions Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Stardos+Stencil:wght@400;700&family=Special+Elite&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a Cold War war-room briefing, sober and even-handed, two rival powers side by side.
+   IDEA: an army situation-room plotting table: green radar-scope map, stencilled labels, typed dossiers.
+   PICTURE: the world map as a glowing green scope with numbered blue (US) and red (Soviet) markers.
+   COLOUR and TYPE: army olive and scope green throughout, blue/red kept only for the two sides; Stardos Stencil titles, Special Elite typed labels, Source Sans 3 text.
+   LAYOUT: title band, folder-tab decades, full-width scope map, then a two-column case list (US | USSR). */
+:root{color-scheme:light dark;
+--bg:light-dark(#d9e0c3,#10170f);--ink:light-dark(#1d2618,#dfe8d3);--mute:light-dark(#56604a,#9fb08f);
+--sea:light-dark(#b9c6a2,#0b1a0e);--land:light-dark(#eef0dc,#2b3527);--edge:light-dark(#8e9c74,#3f7a46);--grat:light-dark(#a3b28a,#1d4a25);
+--us:light-dark(#1f56b8,#62a0ff);--su:light-dark(#b8251c,#ff6152);
+--nam:light-dark(#2f6b38,#3e8a49);--usland:light-dark(#d4ddea,#1f3550);--suland:light-dark(#efd6cc,#47261f);
+--card:light-dark(#eef2df,#162116);--line:light-dark(#c3c8a8,#2d4429);--head:#1e2a19;--olive:#4b5a32;--glow:#8fe39a}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Source Sans 3",system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(20px,3vw,40px) max(4vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+.top{background:var(--head);color:#e6edd9;padding-bottom:0;
+ background-image:repeating-linear-gradient(0deg,rgba(143,227,154,.06) 0 1px,transparent 1px 28px),repeating-linear-gradient(90deg,rgba(143,227,154,.06) 0 1px,transparent 1px 28px);border-bottom:4px solid var(--olive)}
+h1{font:700 clamp(34px,5.4vw,56px)/1.02 "Stardos Stencil",Impact,sans-serif;margin:0 0 8px;text-wrap:balance;letter-spacing:.02em;color:#f1f5e6}
+.top p{margin:0;max-width:68ch;color:#bccab0;font-size:17px}
+.top .key{display:flex;flex-wrap:wrap;gap:8px 22px;margin:14px 0 0;font:15px "Special Elite",serif;color:#d9e3cc}
+.key span{display:inline-flex;align-items:center;gap:8px}
+.sw{width:16px;height:16px;border-radius:50%;display:inline-block;flex:none}
+.sw.us{background:#4d8cf5}.sw.su{background:#ea4033}
+.tabs{display:flex;gap:4px;margin-top:20px;overflow-x:auto}
+.tabs button{flex:1 0 auto;min-height:52px;padding:8px 18px;border:0;border-radius:10px 10px 0 0;background:#34432a;color:#c8d4b8;font:700 clamp(20px,2.6vw,28px)/1 "Stardos Stencil",Impact,sans-serif;cursor:pointer;letter-spacing:.04em}
+.tabs button:hover{background:#435533;color:#fff}
+.tabs button[aria-selected=true]{background:var(--olive);color:#f4f8ea}
+.tabs button:focus-visible,.chip:focus-visible,.zb:focus-visible,.case:focus-visible,.dlg button:focus-visible{outline:3px solid var(--glow);outline-offset:2px}
+.mapband{padding-top:18px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 18px;margin-bottom:12px}
+.blurb{margin:0;font-size:17px;max-width:70ch}
+.blurb b{font:400 18px "Special Elite",serif}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:6px 14px;border-radius:6px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:15px/1 "Special Elite",serif;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.chip[aria-pressed=false]{opacity:.5;text-decoration:line-through}
+.chip .sw.us{background:var(--us)}.chip .sw.su{background:var(--su)}
+.fig{position:relative;height:clamp(300px,52vw,640px);background:radial-gradient(ellipse at 50% 45%,light-dark(#c7d3b0,#123018) 0%,var(--sea) 75%);border-radius:10px;overflow:hidden;border:3px solid var(--olive);box-shadow:inset 0 0 60px light-dark(rgba(60,80,40,.25),rgba(0,0,0,.65))}
+.fig::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,light-dark(rgba(0,0,0,.025),rgba(143,227,154,.035)) 0 1px,transparent 1px 3px)}
+.fig>svg{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+.fig>svg:active{cursor:grabbing}
+.zoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.zb{width:44px;height:44px;border-radius:6px;border:1px solid var(--olive);background:var(--head);color:#dfe8d3;font:700 22px/1 "Source Sans 3",sans-serif;cursor:pointer}
+.zb.rs{font:13px "Special Elite",serif}
+.hint{margin:8px 2px 0;font-size:14px;color:var(--mute)}
+.msg{position:absolute;inset:0;display:none;place-items:center;text-align:center;padding:24px;color:var(--ink);font-size:17px;z-index:1}
+.fig.fail .msg{display:grid}.fig.fail .zoom{display:none}
+.country{fill:var(--land);stroke:var(--edge);stroke-width:.6;vector-effect:non-scaling-stroke}
+.country.usa{fill:var(--usland)}
+.country.nam{fill:var(--nam)}
+.sq{width:16px;height:16px;border-radius:3px;display:inline-block;flex:none;background:#3e8a49;border:1px solid #9fd3a6}
+.country.sov{fill:var(--suland);stroke:var(--suland)}
+.ussr{fill:none;stroke:var(--su);stroke-width:1.2;stroke-opacity:.6;vector-effect:non-scaling-stroke}
+.grat{fill:none;stroke:var(--grat);stroke-width:.6;vector-effect:non-scaling-stroke}
+.plab{font:700 15px "Stardos Stencil",Impact,sans-serif;letter-spacing:.14em;pointer-events:none;opacity:.8}
+.plab.us{fill:var(--us)}.plab.su{fill:var(--su)}
+.lead{stroke:var(--ink);stroke-opacity:.6;stroke-width:1;vector-effect:non-scaling-stroke}
+.anc circle{fill:var(--ink)}
+.mk{cursor:pointer;outline:none}
+.mk .dot{stroke:var(--card);stroke-width:2}
+.mk.us{color:var(--us)}.mk.su{color:var(--su)}
+.mk.doc .dot{fill:currentColor}
+.mk text{font:700 11px "Source Sans 3",sans-serif;text-anchor:middle;fill:#fff;pointer-events:none}
+.mk .ring{fill:none;stroke:currentColor;stroke-width:2;transform-box:fill-box;transform-origin:center;opacity:0;animation:pulse 2.2s ease-out 3}
+.mk:hover .dot,.mk:focus-visible .dot{stroke:var(--glow);stroke-width:3}
+@keyframes pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.3);opacity:0}}
+@media (prefers-reduced-motion:reduce){.mk .ring{animation:none}}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 36px}
+.cols h2{font:700 clamp(24px,3vw,32px)/1.05 "Stardos Stencil",Impact,sans-serif;margin:0 0 10px;padding-bottom:8px;border-bottom:3px solid var(--olive);color:var(--ink);display:flex;align-items:center;gap:10px}
+.cols h2::before{content:"";width:16px;height:16px;border-radius:50%;flex:none}
+.cols .us h2::before{background:var(--us)}.cols .su h2::before{background:var(--su)}
+.cases{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.case{width:100%;display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start;text-align:start;padding:10px 12px;min-height:44px;border:1px solid var(--line);border-left:5px solid var(--olive);border-radius:4px;background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
+.case:hover{border-color:var(--olive);background:light-dark(#eff1dc,#1c2b1b)}
+.num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:700 14px/1 "Source Sans 3",sans-serif;color:#fff}
+.us .num{background:var(--us)}.su .num{background:var(--su)}
+.case b{display:block;font-weight:700;line-height:1.25}
+.case small{display:block;color:var(--mute);font:14px "Special Elite",serif;margin-top:3px}
+.empty{color:var(--mute);font-style:italic;padding:8px 0}
+.notes{border-top:3px solid var(--olive);color:var(--mute);font-size:15px}
+.notes p{margin:0 0 6px;max-width:80ch}
+.dlg{position:fixed;inset:0;z-index:10;display:none;place-items:center;padding:16px;background:rgba(6,12,6,.7)}
+.dlg.on{display:grid}
+.box{width:min(640px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--card);color:var(--ink);border-radius:6px;border:3px solid var(--olive);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.dh{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:start;padding:18px 18px 16px;color:#eef3e4;background:var(--head);border-bottom:6px solid}
+.dh.us{border-color:var(--us)}.dh.su{border-color:var(--su)}
+.dh .big{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:700 24px/1 "Stardos Stencil",sans-serif;color:#fff}
+.dh.us .big{background:var(--us)}.dh.su .big{background:var(--su)}
+.dh p{margin:0;font:15px "Special Elite",serif;opacity:.9}
+.dh h2{margin:4px 0 4px;font:700 clamp(26px,4vw,34px)/1.05 "Stardos Stencil",Impact,sans-serif;text-wrap:balance}
+.x{width:44px;height:44px;border-radius:6px;border:1px solid #4b5a32;background:#2b3a24;color:#fff;font:700 24px/1 sans-serif;cursor:pointer}
+.db{padding:16px 20px 6px}
+.db h3{margin:12px 0 2px;font:400 15px "Special Elite",serif;color:var(--mute)}
+.db p{margin:0 0 6px;font-size:17px}
+.df{display:flex;justify-content:space-between;gap:10px;padding:12px 20px 18px}
+.df button{min-height:44px;padding:8px 16px;border-radius:6px;border:1px solid var(--olive);background:var(--bg);color:var(--ink);font:15px "Special Elite",serif;cursor:pointer}
+.df button:disabled{opacity:.35;cursor:default}
+@media(max-width:700px){.cols{grid-template-columns:minmax(0,1fr)}.fig{height:clamp(260px,70vw,420px)}.tabs button{padding:8px 10px}}
+</style>
+</head>
+<body>
+<header class="band top"><div class="wrap">
+  <h1>Cold War coups and interventions</h1>
+  <p>Where the United States and the Soviet Union reached into other countries' politics, secretly and sometimes openly, decade by decade. Click a numbered marker or a case in the list to read what happened.</p>
+  <div class="key">
+    <span><i class="sw us"></i>United States / CIA</span>
+    <span><i class="sw su"></i>Soviet Union / KGB</span>
+    <span><i class="sq"></i>Non-Aligned Movement member (from the 1960s tab on)</span>
+      </div>
+  <nav class="tabs" role="tablist" aria-label="Decade" id="tabs">
+    <button role="tab" data-d="1940s">1940s</button><button role="tab" data-d="1950s">1950s</button><button role="tab" data-d="1960s">1960s</button><button role="tab" data-d="1970s">1970s</button><button role="tab" data-d="1980s">1980s</button>
+  </nav>
+</div></header>
+
+<main>
+<section class="band mapband"><div class="wrap">
+  <div class="bar">
+    <p class="blurb" id="blurb"></p>
+    <div class="chips">
+      <button class="chip" data-f="us" aria-pressed="true"><i class="sw us"></i>U.S.</button>
+      <button class="chip" data-f="su" aria-pressed="true"><i class="sw su"></i>Soviet</button>
+    </div>
+  </div>
+  <div class="fig" id="fig">
+    <svg id="map" role="img" aria-label="World map with numbered markers for each case"></svg>
+    <div class="zoom"><button class="zb" id="zin" aria-label="Zoom in">+</button><button class="zb" id="zout" aria-label="Zoom out">−</button><button class="zb rs" id="zrs" aria-label="Reset map">Reset</button></div>
+    <div class="msg">The map outlines could not load. They come from an online map library, so check the internet connection. The full list of cases below still works.</div>
+  </div>
+  <p class="hint">Drag to move the map. Use the + and − buttons, pinch, or Ctrl + scroll to zoom in on crowded areas like the Caribbean.</p>
+</div></section>
+
+<section class="band" style="padding-top:8px"><div class="wrap cols">
+  <div class="us"><h2>United States / CIA</h2><ol class="cases" id="listUS"></ol></div>
+  <div class="su"><h2>Soviet Union / KGB</h2><ol class="cases" id="listSU"></ol></div>
+</div></section>
+
+<section class="band notes"><div class="wrap">
+  <p>Only cases where the superpower's role is well documented (declassified records, official admissions, or archives opened after 1991) are included.</p>
+  <p><b>Non-Aligned Movement.</b> Countries shaded dark green were members of the Non-Aligned Movement during the Cold War, which refused to formally join either the US or Soviet side. The movement was founded at Belgrade in 1961, so shading appears from the 1960s tab on. Members are based on the 1987 membership list, plus Burma (a founding member that left in 1979), Venezuela (joined 1989), and Namibia (represented by SWAPO before independence). The list is the 1987 one, so some countries shown had not joined yet in the 1960s.</p>
+  <p><b>Borders.</b> The map shows today's borders. The Soviet Union is shaded as one country, but divided Germany, Yugoslavia, and the two Yemens appear with their modern borders.</p>
+  <p>Before 1954, Soviet intelligence went by other names (NKVD, MGB). Several Soviet cases were carried out mainly by the army rather than the KGB.</p>
+</div></section>
+</main>
+
+<div class="dlg" id="dlg" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+  <div class="box">
+    <div class="dh" id="dHead"><div class="big" id="dNum"></div><div><p id="dSide"></p><h2 id="dTitle"></h2><p id="dMeta"></p></div><button class="x" id="dClose" aria-label="Close">×</button></div>
+    <div class="db" id="dBody"></div>
+    <div class="df"><button id="dPrev">← Previous</button><button id="dNext">Next →</button></div>
+  </div>
+</div>
+
+<script>
+{
+const D=[
+// ---------- 1940s ----------
+{id:"us-italy",side:"us",d:["1940s"],y:1948,dates:"1947–1948",place:"Italy",lat:41.9,lon:12.5,ev:"doc",title:"The Italian election",
+who:"CIA and the US government vs. the Italian Communist Party",
+what:"The CIA secretly gave money to the Christian Democrats and spread anti-communist propaganda, while US officials warned that aid would stop if the Communists won. The Christian Democrats won the April 1948 election by a wide margin.",
+why:"It was the CIA's first major covert operation to shape a foreign election. Its success made secret political spending a standard US Cold War tool."},
+{id:"su-italy",side:"su",d:["1940s"],y:1948.1,dates:"Late 1940s–1980s",place:"Italy",lat:41.9,lon:12.5,ev:"doc",title:"Funding Italy's Communist Party",
+who:"Soviet Union and the Italian Communist Party vs. the Christian Democrats",
+what:"Moscow secretly sent money to the Italian Communist Party, the largest in Western Europe, including during the 1948 election. Soviet archives opened after 1991 show the payments continued for decades.",
+why:"It was the Soviet mirror image of the CIA's operation in the same election. Both superpowers treated Italy as a battleground for Western Europe."},
+{id:"us-albania",side:"us",d:["1940s","1950s"],y:1949,dates:"1949–1953",place:"Albania",lat:41.33,lon:19.82,ev:"doc",title:"Operation Valuable",
+who:"CIA and British MI6 vs. Enver Hoxha's communist government",
+what:"The CIA and MI6 sent teams of Albanian exiles into the country by boat and parachute to start an uprising. Nearly all were captured or killed, partly because British double agent Kim Philby passed the plans to Moscow.",
+why:"It was an early test of “rollback,” the idea of freeing countries already under communism. Its failure pushed the US toward containment instead."},
+{id:"su-iran",side:"su",d:["1940s"],y:1946,dates:"1945–1946",place:"Northern Iran",lat:38.08,lon:46.29,ev:"doc",title:"The Iran crisis",
+who:"Soviet Union vs. the Iranian government",
+what:"Soviet troops stayed in northern Iran after World War II and backed two breakaway states, the Azerbaijan People's Government and the Kurdish Republic of Mahabad. Under pressure from the US, Britain, and the new United Nations, the Soviets withdrew in 1946 and both states collapsed.",
+why:"It was one of the first crises of the Cold War and an early case for the UN Security Council. It showed that Soviet expansion could be pushed back by diplomatic pressure."},
+{id:"su-czech48",side:"su",d:["1940s"],y:1948.2,dates:"February 1948",place:"Czechoslovakia",lat:50.08,lon:14.44,ev:"doc",title:"The Prague coup",
+who:"Soviet Union and the Czechoslovak Communist Party vs. non-communist ministers",
+what:"When non-communist ministers resigned to force new elections, the Communists used the police, armed workers' militias, and mass rallies to take full control. A senior Soviet diplomat was in Prague during the crisis, and Foreign Minister Jan Masaryk was found dead weeks later.",
+why:"The coup shocked the West and helped push Congress to pass the Marshall Plan. It also sped up the creation of NATO in 1949."},
+// ---------- 1950s ----------
+{id:"su-gdr",side:"su",d:["1950s"],y:1953,dates:"June 1953",place:"East Germany",lat:52.52,lon:13.4,ev:"doc",title:"Crushing the East German uprising",
+who:"Soviet army vs. East German workers",
+what:"Protests against higher work quotas spread into an uprising across East Germany on June 17, 1953. Soviet tanks crushed it, and dozens of people were killed.",
+why:"It was the first major uprising in the Soviet bloc. It showed that East Germany's government depended on Soviet troops to survive."},
+{id:"us-iran",side:"us",d:["1950s"],y:1953.5,dates:"August 1953",place:"Iran",lat:35.69,lon:51.39,ev:"doc",title:"Operation Ajax",
+who:"CIA, British MI6, and the Shah vs. Prime Minister Mohammad Mosaddegh",
+what:"After Mosaddegh nationalized Iran's British-owned oil industry, the CIA and MI6 paid for street protests, bribed officials, and backed General Fazlollah Zahedi. The first attempt failed, but a second push on August 19 removed Mosaddegh and restored the Shah's power.",
+why:"The Shah ruled with US support for the next 25 years. Anger over the coup fed into the 1979 Iranian Revolution and the hostility toward the US that followed."},
+{id:"us-guat",side:"us",d:["1950s"],y:1954,dates:"June 1954",place:"Guatemala",lat:14.63,lon:-90.51,ev:"doc",title:"Operation PBSuccess",
+who:"CIA and Colonel Carlos Castillo Armas vs. President Jacobo Árbenz",
+what:"Árbenz's land reform took unused land from the US-owned United Fruit Company, and US leaders feared communist influence in his government. The CIA armed a small exile force, ran fake radio broadcasts, and bombed Guatemala City until Árbenz resigned.",
+why:"Military governments followed, and Guatemala's civil war (1960–1996) killed about 200,000 people. The coup's quick success made the CIA confident it could repeat the model, including in Cuba."},
+{id:"su-hungary56",side:"su",d:["1950s"],y:1956,dates:"October–November 1956",place:"Hungary",lat:47.5,lon:19.04,ev:"doc",title:"Crushing the Hungarian Revolution",
+who:"Soviet army vs. Imre Nagy's government and Hungarian revolutionaries",
+what:"Student protests in Budapest grew into a revolution, and new leader Imre Nagy announced Hungary would leave the Warsaw Pact. Soviet tanks returned on November 4, about 2,500 Hungarians were killed, and Nagy was later executed.",
+why:"The US did not step in, which showed it would not risk war over Soviet-controlled Europe. Many Western communists quit their parties in protest."},
+{id:"us-syria57",side:"us",d:["1950s"],y:1957,dates:"1957",place:"Syria",lat:33.51,lon:36.29,ev:"doc",title:"The failed Syria plot",
+who:"CIA and British intelligence vs. Syria's left-leaning government",
+what:"In August 1957 Syria's government exposed a CIA plot to overthrow it and expelled three US diplomats. Documents found decades later show Britain and the US had also drawn up plans to stir up border incidents and remove Syria's leftist leaders.",
+why:"The failed plot pushed Syria closer to Egypt and the Soviet Union. A few months later, Syria merged with Egypt to form the United Arab Republic (1958)."},
+{id:"us-indo58",side:"us",d:["1950s"],y:1957.5,dates:"1957–1958",place:"Indonesia (Sulawesi and Sumatra)",lat:1.49,lon:124.84,ev:"doc",title:"Arming the rebels against Sukarno",
+who:"CIA vs. President Sukarno",
+what:"The CIA supplied weapons, money, and pilots to rebel army officers in Sumatra and Sulawesi who opposed Sukarno. The operation was exposed when American pilot Allen Pope was shot down and captured in May 1958.",
+why:"The failure embarrassed the US and pushed Sukarno closer to Indonesia's Communist Party. It helped set the stage for the violence of 1965."},
+{id:"us-tibet",side:"us",d:["1950s","1960s"],y:1957.6,dates:"1957–early 1970s",place:"Tibet",lat:29.65,lon:91.1,ev:"doc",title:"Arming the Tibetan resistance",
+who:"CIA and Tibetan resistance fighters vs. the People's Republic of China",
+what:"The CIA trained Tibetan fighters, some of them in Colorado, and dropped them back into Tibet with weapons and radios. In the 1960s it supported guerrillas fighting from bases in Mustang, Nepal.",
+why:"The resistance could not defeat China, and the Dalai Lama fled to India in 1959. US support wound down as Nixon moved to open relations with China in the early 1970s."},
+{id:"us-laos",side:"us",d:["1950s","1960s","1970s"],y:1958,dates:"1958–1973",place:"Laos",lat:17.97,lon:102.6,ev:"doc",title:"The Secret War in Laos",
+who:"CIA, a Hmong army under General Vang Pao, and the Royal Lao Government vs. the Pathet Lao and North Vietnam",
+what:"The CIA meddled in Laotian politics from the late 1950s, then ran a secret war using a Hmong army of tens of thousands led by Vang Pao. US planes dropped more than 2 million tons of bombs on Laos.",
+why:"Laos became the most heavily bombed country per person in history, and unexploded bombs still kill people there today. Many Hmong who fought for the US fled as refugees after the communist victory in 1975."},
+// ---------- 1960s ----------
+{id:"us-congo",side:"us",d:["1960s"],y:1960,dates:"1960–1961",place:"Congo",lat:-4.32,lon:15.31,ev:"doc",title:"The plot against Lumumba",
+who:"CIA, Belgium, and Joseph Mobutu vs. Prime Minister Patrice Lumumba",
+what:"The CIA saw Lumumba as too close to the Soviets and sent poison to kill him, though it was never used. After Mobutu pushed Lumumba out of power, he was handed to his enemies in Katanga and shot by Katangan forces, with Belgian officers present, in January 1961.",
+why:"The US went on to back Mobutu, who took full power in 1965 and ruled the country, which he renamed Zaire, for 32 years. Lumumba became a symbol of African independence crushed by Cold War politics."},
+{id:"us-dr61",side:"us",d:["1960s"],y:1961.4,dates:"May 1961",place:"Dominican Republic",lat:18.49,lon:-69.93,ev:"doc",title:"The killing of Trujillo",
+who:"CIA and Dominican dissidents vs. dictator Rafael Trujillo",
+what:"Trujillo had ruled the Dominican Republic brutally for 31 years. The CIA supplied weapons to the dissidents who ambushed and killed him in May 1961.",
+why:"The US feared that a hated right-wing dictator could open the door to a Castro-style revolution. Removing him was meant to prevent “another Cuba.”"},
+{id:"us-guyana",side:"us",d:["1960s"],y:1962,dates:"1962–1964",place:"British Guiana",lat:6.8,lon:-58.16,ev:"doc",title:"Removing Cheddi Jagan",
+who:"CIA and the British government vs. Premier Cheddi Jagan",
+what:"The CIA funded strikes and riots against Jagan, a Marxist leader in the British colony, while Britain changed the voting system before the 1964 election. Jagan lost power to Forbes Burnham.",
+why:"The US and Britain made sure that Guyana would not be led by a leftist when it became independent in 1966. Burnham ruled for 20 years, and the unrest deepened divisions between the country's Indian and African communities."},
+{id:"us-brazil",side:"us",d:["1960s"],y:1964,dates:"March–April 1964",place:"Brazil",lat:-15.8,lon:-47.9,ev:"doc",title:"The Brazilian coup",
+who:"US government and the Brazilian military vs. President João Goulart",
+what:"The US encouraged Brazilian generals plotting against Goulart, whose reforms they saw as leaning left. Operation Brother Sam put a US naval task force and fuel on standby to help, but it was not needed because Goulart fell quickly.",
+why:"Brazil was ruled by a military dictatorship for 21 years. Its coup became a model for other military takeovers in South America."},
+{id:"us-dr65",side:"us",d:["1960s"],y:1965,dates:"April 1965",place:"Dominican Republic",lat:18.49,lon:-69.93,ev:"doc",title:"US invasion of the Dominican Republic",
+who:"US Marines and Army vs. rebels supporting ousted president Juan Bosch",
+what:"Fighting broke out between supporters of Bosch, an elected president who had been overthrown, and the military. President Johnson sent more than 20,000 troops, saying he had to stop a possible communist takeover.",
+why:"It was the first US invasion of a Latin American country in more than 30 years. Joaquín Balaguer won the election held afterward and ruled for the next 12 years."},
+{id:"us-indo65",side:"us",d:["1960s"],y:1965.8,dates:"1965–1966",place:"Indonesia",lat:-6.2,lon:106.85,ev:"doc",title:"The Indonesian mass killings",
+who:"Indonesian army (General Suharto) vs. the Indonesian Communist Party (PKI)",
+what:"After a failed coup attempt in September 1965 was blamed on the Communist Party, the army and allied groups killed at least 500,000 suspected communists. The US embassy gave the army lists of communist names, along with money and radios, and privately welcomed the killings.",
+why:"Suharto pushed Sukarno aside and ruled Indonesia until 1998 as a close US ally. The killings were one of the largest mass murders of the 20th century."},
+{id:"su-czech68",side:"su",d:["1960s"],y:1968,dates:"August 1968",place:"Czechoslovakia",lat:50.08,lon:14.44,ev:"doc",title:"Ending the Prague Spring",
+who:"Warsaw Pact armies vs. Alexander Dubček's reform government",
+what:"Dubček's “Prague Spring” loosened censorship and promised “socialism with a human face.” On August 20–21, hundreds of thousands of Warsaw Pact troops invaded and ended the reforms.",
+why:"Soon after, the Soviets announced the Brezhnev Doctrine, the claim that they could intervene in any socialist country. The invasion turned many people inside and outside the bloc against Soviet communism."},
+// ---------- 1970s ----------
+{id:"us-chile",side:"us",d:["1970s"],y:1970,dates:"1970–1973",place:"Chile",lat:-33.45,lon:-70.67,ev:"doc",title:"Track II and the road to Pinochet",
+who:"CIA and the Nixon administration vs. President Salvador Allende",
+what:"When the Marxist Allende won the 1970 election, Nixon ordered the CIA to keep him from taking office, and CIA-backed kidnapping plots led to the killing of army chief René Schneider. After Allende took office, the US cut aid and secretly funded opposition newspapers, parties, and strikes.",
+why:"General Augusto Pinochet overthrew Allende on September 11, 1973, and ruled until 1990, killing or “disappearing” more than 3,000 people. The CIA's role in the 1973 coup itself is still debated, but it helped create the conditions for it."},
+{id:"su-chile",side:"su",d:["1970s"],y:1970.1,dates:"1970–1973",place:"Chile",lat:-33.45,lon:-70.67,ev:"doc",title:"KGB money in Chile",
+who:"KGB, Allende's campaign, and the Chilean Communist Party",
+what:"Records smuggled out by KGB archivist Vasili Mitrokhin show the KGB gave money to Allende's campaign and to Chile's Communist Party. The KGB also tried to build a close relationship with Allende himself.",
+why:"Both superpowers were trying to steer Chile's politics at the same time. It shows the Cold War competition reached elections far from Europe."},
+{id:"us-angola",side:"us",d:["1970s","1980s"],y:1975,dates:"1975–1976; 1985–1991",place:"Angola",lat:-8.84,lon:13.23,ev:"doc",title:"Arming the FNLA and UNITA",
+who:"CIA, the FNLA, and UNITA (Jonas Savimbi), alongside South Africa, vs. the MPLA, Cuba, and the Soviet Union",
+what:"As Portugal left Angola in 1975, the CIA secretly armed the FNLA and UNITA against the Soviet-backed MPLA. Congress banned the aid in 1976 (the Clark Amendment), but the ban was repealed in 1985, and the US sent missiles and weapons to UNITA until the Cold War ended.",
+why:"Angola's civil war became one of the Cold War's largest proxy wars, with Cuban troops on one side and South Africa on the other. Fighting lasted until 2002 and killed hundreds of thousands of people."},
+{id:"su-angola",side:"su",d:["1970s","1980s"],y:1975.1,dates:"1975–1991",place:"Angola",lat:-8.84,lon:13.23,ev:"doc",title:"Backing the MPLA",
+who:"Soviet Union, Cuba, and the MPLA vs. the FNLA, UNITA, and South Africa",
+what:"The Soviets supplied weapons and advisers to the MPLA, while Cuba sent tens of thousands of troops, and the MPLA declared independence from Luanda in November 1975. Soviet and Cuban support kept the MPLA in power through the long civil war.",
+why:"Angola was the biggest Soviet-Cuban intervention in Africa. It raised US fears that the Soviets were expanding worldwide while America recovered from Vietnam."},
+{id:"su-ethiopia",side:"su",d:["1970s"],y:1977.5,dates:"1977–1978",place:"Ethiopia",lat:9.03,lon:38.74,ev:"doc",title:"Rescuing Mengistu in the Ogaden War",
+who:"Soviet Union, Cuba, and Mengistu Haile Mariam vs. Somalia",
+what:"When Somalia invaded Ethiopia's Ogaden region in 1977, the Soviets switched sides from Somalia to Ethiopia's Marxist leader, Mengistu. They airlifted about $1 billion in weapons, and Cuban troops helped drive the Somalis back by early 1978.",
+why:"Ethiopia became a key Soviet ally in the Horn of Africa. Mengistu's “Red Terror” against his opponents killed tens of thousands of people."},
+{id:"us-afghan",side:"us",d:["1970s","1980s"],y:1979.5,dates:"1979–1989",place:"Afghanistan (aid through Pakistan)",lat:34.01,lon:71.58,ev:"doc",title:"Operation Cyclone",
+who:"CIA, Pakistan's intelligence service (ISI), and Saudi Arabia vs. the Soviet army and the Afghan communist government",
+what:"The CIA began secret aid to Afghan rebels in July 1979 and greatly expanded it after the Soviet invasion that December. Weapons and money flowed through Pakistan's intelligence service, including Stinger anti-aircraft missiles starting in 1986.",
+why:"The war cost the Soviets about 15,000 dead and helped weaken the Soviet Union. The networks of fighters and weapons built up during the war later helped give rise to the Taliban and al-Qaeda."},
+{id:"su-nicaragua",side:"su",d:["1970s","1980s"],y:1979.6,dates:"1979–1990",place:"Nicaragua",lat:12.13,lon:-86.25,ev:"doc",title:"Supporting the Sandinistas",
+who:"Soviet Union, Cuba, and the Sandinista government vs. the Contras",
+what:"After the Sandinistas overthrew dictator Anastasio Somoza in July 1979, Cuba sent advisers, and the Soviet Union later supplied weapons, helicopters, and oil. Much of the Soviet help came through Cuba.",
+why:"The Reagan administration used Soviet aid to justify funding the Contras. The Sandinistas lost the 1990 election as Soviet support dried up."},
+{id:"su-afghan79",side:"su",d:["1970s"],y:1979.9,dates:"December 1979",place:"Afghanistan",lat:34.53,lon:69.17,ev:"doc",title:"Operation Storm-333 and the invasion",
+who:"KGB and Soviet special forces vs. President Hafizullah Amin",
+what:"On December 27, 1979, KGB and Soviet special forces stormed Amin's palace in Kabul and killed him in Operation Storm-333. Soviet troops poured into the country, and Moscow installed Babrak Karmal as leader.",
+why:"The invasion ended détente: the US boycotted the 1980 Moscow Olympics and expanded aid to the Afghan rebels. It began a ten-year war often called the Soviet Union's Vietnam."},
+// ---------- 1980s ----------
+{id:"su-afghan80",side:"su",d:["1980s"],y:1980,dates:"1979–1989",place:"Afghanistan",lat:34.53,lon:69.17,ev:"doc",title:"The Soviet war in Afghanistan",
+who:"Soviet army and the Afghan communist government vs. the mujahideen",
+what:"About 100,000 Soviet troops fought Afghan rebels for nearly ten years, and heavy bombing drove millions of Afghans into refugee camps in Pakistan and Iran. Gorbachev pulled the last troops out in February 1989.",
+why:"About 15,000 Soviet soldiers died, and the war drained the Soviet economy and morale. Historians count it among the causes of the Soviet collapse in 1991."},
+{id:"us-nicaragua",side:"us",d:["1980s"],y:1981,dates:"1981–1990",place:"Nicaragua",lat:12.13,lon:-86.25,ev:"doc",title:"The Contra war and Iran–Contra",
+who:"CIA and the Contras vs. the Sandinista government",
+what:"The CIA organized and funded the Contras, rebels who fought the Sandinistas from bases in Honduras, and in 1984 it mined Nicaragua's harbors. When Congress cut off aid, White House officials secretly sold weapons to Iran and sent the profits to the Contras.",
+why:"The war killed tens of thousands of Nicaraguans, and the World Court ruled in 1986 that the US had broken international law. The Iran–Contra affair became the biggest scandal of Reagan's presidency."},
+{id:"su-poland81",side:"su",d:["1980s"],y:1981.9,dates:"December 1981",place:"Poland",lat:52.23,lon:21.01,ev:"doc",title:"Pressure for martial law",
+who:"Soviet Union and General Wojciech Jaruzelski vs. Solidarity",
+what:"The Solidarity trade union grew to about 10 million members, and Soviet leaders pressed Poland's government to crush it while holding military exercises nearby. On December 13, 1981, Jaruzelski declared martial law and arrested thousands of Solidarity activists.",
+why:"Historians still argue over whether the Soviets would have invaded if Poland had not acted. Solidarity survived underground and came back to win in 1989."},
+{id:"us-poland",side:"us",d:["1980s"],y:1982,dates:"1982–1989",place:"Poland (Gdańsk)",lat:54.35,lon:18.65,ev:"doc",title:"Keeping Solidarity alive",
+who:"CIA and American labor unions vs. Poland's communist government",
+what:"After martial law banned Solidarity, the CIA secretly sent money, printing equipment, and radios to help it keep working underground. American unions and other groups sent aid openly.",
+why:"Solidarity survived and won the partly free elections of June 1989. Poland's change helped start the chain of revolutions that ended communism in Eastern Europe."},
+{id:"su-infektion",side:"su",d:["1980s"],y:1983,dates:"1983–1987",place:"India, then worldwide",lat:28.61,lon:77.21,ev:"doc",title:"Operation INFEKTION",
+who:"KGB, with help from East Germany's Stasi, vs. the United States",
+what:"The KGB planted a story in an Indian newspaper in 1983 claiming the US military had created AIDS. Over the next several years it spread the false claim through Soviet media and in dozens of countries.",
+why:"It is the best-known example of Soviet “active measures,” or disinformation campaigns. Versions of the conspiracy theory still circulate today."},
+{id:"us-grenada",side:"us",d:["1980s"],y:1983.8,dates:"October 1983",place:"Grenada",lat:12.06,lon:-61.75,ev:"doc",title:"Invasion of Grenada",
+who:"US forces and Caribbean allies vs. Grenada's military government and Cuban personnel",
+what:"After a hardline faction killed Prime Minister Maurice Bishop, about 7,000 US troops invaded the small Caribbean island. Reagan said he was protecting American medical students and stopping a Soviet-Cuban foothold, where Cuban workers were building a large airport.",
+why:"It was the first major US military operation since Vietnam, and it removed a Cuban-aligned government within days. The UN General Assembly condemned it as a violation of international law."},
+{id:"us-panama",side:"us",d:["1980s"],y:1989,dates:"December 1989",place:"Panama",lat:8.98,lon:-79.52,ev:"doc",title:"Invasion of Panama",
+who:"US military vs. General Manuel Noriega",
+what:"Noriega, a former CIA informant, had become involved in drug trafficking and threw out the results of a 1989 election. About 27,000 US troops invaded, and Noriega surrendered in January 1990 and was flown to the US for trial.",
+why:"It was the last US invasion of the Cold War era and the first in decades not justified as fighting communism. Hundreds of Panamanian civilians were killed."}
+];
+const BLURB={
+"1940s":"Stalin locks down Eastern Europe, while the CIA's first covert operations target Italy and Albania.",
+"1950s":"The CIA's era of quick coups in Iran and Guatemala. Soviet tanks crush uprisings in East Germany and Hungary.",
+"1960s":"Decolonization and the Cuban Revolution pull the contest into Africa, Asia, and Latin America.",
+"1970s":"Chile, Angola, and Afghanistan: both sides back proxies far from home.",
+"1980s":"Proxy wars in Afghanistan, Nicaragua, and Angola, and Poland's Solidarity, as the Cold War winds down."};
+const DEC=["1940s","1950s","1960s","1970s","1980s"];
+const SIDE={us:"United States / CIA",su:"Soviet Union / KGB"};
+const NAM=new Set(["AFG", "DZA", "AGO", "ARG", "BHS", "BHR", "BGD", "BRB", "BLZ", "BEN", "BTN", "BOL", "BWA", "BFA", "BDI", "CMR", "CPV", "CAF", "TCD", "COL", "COM", "COG", "CIV", "CUB", "CYP", "PRK", "DJI", "ECU", "EGY", "GNQ", "ERI", "ETH", "GAB", "GMB", "GHA", "GRD", "GIN", "GNB", "GUY", "IND", "IDN", "IRN", "IRQ", "JAM", "JOR", "KHM", "KEN", "KWT", "LAO", "LBN", "LSO", "LBR", "LBY", "MDG", "MWI", "MYS", "MDV", "MLI", "MLT", "MRT", "MUS", "MAR", "MOZ", "NPL", "NIC", "NER", "NGA", "OMN", "PAK", "PSE", "PAN", "PER", "QAT", "RWA", "LCA", "STP", "SAU", "SEN", "SYC", "SLE", "SGP", "SOM", "NAM", "LKA", "SDN", "SSD", "SUR", "SWZ", "SYR", "TGO", "TTO", "TUN", "UGA", "ARE", "TZA", "VUT", "VNM", "YEM", "SRB", "MNE", "BIH", "HRV", "SVN", "MKD", "COD", "ZMB", "ZWE", "MMR", "VEN"]);
+const SOV=new Set(["RUS","UKR","BLR","MDA","LTU","LVA","EST","GEO","ARM","AZE","KAZ","UZB","TKM","KGZ","TJK"]);
+const $=s=>document.querySelector(s);
+let dec="1940s",cur=[],vis=[],filt={us:true,su:true,deb:true},openN=null,lastFocus=null;
+let ready=false,svg,g,gLand,gMk,gLbl,proj,zoom,k=1,features=[],topo=null,obj=null;
+
+function setDecade(d){
+  if(!DEC.includes(d))d="1940s";dec=d;
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.d===d));
+  cur=D.filter(e=>e.d.includes(d)).sort((a,b)=>a.y-b.y).map((e,i)=>({...e,n:i+1}));
+  const nu=cur.filter(e=>e.side==="us").length,ns=cur.length-nu;
+  $("#blurb").innerHTML=`<b>${d}:</b> ${BLURB[d]} <span style="color:var(--mute)">${nu} U.S. · ${ns} Soviet</span>`;
+  shadeNAM();
+  refresh();
+}
+function shadeNAM(){if(ready&&gLand)gLand.selectAll("path.country").classed("nam",f=>dec>="1960s"&&NAM.has(f.id))}
+function refresh(){
+  vis=cur.filter(e=>filt[e.side]&&(filt.deb||e.ev==="doc"));
+  const li=e=>`<li><button class="case" data-n="${e.n}"><span class="num ${e.ev}">${e.n}</span><span><b>${e.title}${e.ev==="deb"?'<span class="tag">debated</span>':""}</b><small>${e.place} · ${e.dates}</small></span></button></li>`;
+  for(const s of ["us","su"]){
+    const L=vis.filter(e=>e.side===s);
+    $(s==="us"?"#listUS":"#listSU").innerHTML=L.length?L.map(li).join(""):`<li class="empty">${filt[s]?"No cases on this list for this decade.":"Hidden by the filter above."}</li>`;
+  }
+  renderMarkers();
+}
+function openCase(n){
+  const e=cur.find(x=>x.n===n);if(!e)return;
+  if(!$("#dlg").classList.contains("on"))lastFocus=document.activeElement;
+  openN=n;
+  $("#dHead").className="dh "+e.side;$("#dNum").textContent=e.n;
+  $("#dSide").textContent=SIDE[e.side]+" · "+dec;$("#dTitle").textContent=e.title;$("#dMeta").textContent=e.place+" · "+e.dates;
+  $("#dBody").innerHTML=`<h3>Who was involved</h3><p>${e.who}</p><h3>What happened</h3><p>${e.what}</p><h3>Why it mattered</h3><p>${e.why}</p>`;
+  const i=vis.findIndex(x=>x.n===n);
+  $("#dPrev").disabled=i<=0;$("#dNext").disabled=i<0||i>=vis.length-1;
+  $("#dlg").classList.add("on");$("#dClose").focus();
+}
+function step(dir){const i=vis.findIndex(x=>x.n===openN);const e=vis[i+dir];if(e)openCase(e.n)}
+function closeCase(){$("#dlg").classList.remove("on");openN=null;if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+
+/* ---------- map ---------- */
+function layout(r){
+  const P=vis.map(e=>({x:e.x0,y:e.y0}));
+  for(let it=0;it<90;it++){let moved=false;
+    for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){
+      const a=P[i],b=P[j];let dx=b.x-a.x,dy=b.y-a.y,dist=Math.hypot(dx,dy);const min=2*r+2/k;
+      if(dist<min){let ux,uy;if(dist<1e-6){const ang=i*2.4+j*0.7;ux=Math.cos(ang);uy=Math.sin(ang)}else{ux=dx/dist;uy=dy/dist}
+        const p=(min-dist)/2;a.x-=ux*p;a.y-=uy*p;b.x+=ux*p;b.y+=uy*p;moved=true}}
+    if(!moved)break}
+  return P;
+}
+function placeMarkers(){
+  if(!ready)return;const P=layout(12/k);
+  gMk.node().querySelectorAll(".item").forEach((it,i)=>{
+    const e=vis[i],p=P[i],off=Math.hypot(p.x-e.x0,p.y-e.y0)>3/k;
+    it.querySelector(".mk").setAttribute("transform",`translate(${p.x},${p.y}) scale(${1/k})`);
+    const a=it.querySelector(".anc"),l=it.querySelector(".lead");
+    a.setAttribute("transform",`translate(${e.x0},${e.y0}) scale(${1/k})`);a.style.display=off?"":"none";
+    l.setAttribute("x1",e.x0);l.setAttribute("y1",e.y0);l.setAttribute("x2",p.x);l.setAttribute("y2",p.y);l.style.display=off?"":"none";
+  });
+  gLbl.selectAll("text").attr("font-size",15/k);
+}
+function renderMarkers(){
+  if(!ready)return;
+  vis.forEach(e=>{const p=proj([e.lon,e.lat])||[0,0];e.x0=p[0];e.y0=p[1]});
+  gMk.html(vis.map((e,i)=>`<g class="item" data-i="${i}"><line class="lead"></line><g class="anc"><circle r="3"></circle></g><g class="mk ${e.side} ${e.ev}" tabindex="0" role="button" aria-label="${e.n}. ${e.title}, ${e.place}"><title>${e.n}. ${e.title} (${e.dates})</title><circle class="ring" r="11"></circle><circle class="dot" r="11"></circle><text dy="0.36em">${e.n}</text></g></g>`).join(""));
+  placeMarkers();
+}
+function drawMap(){
+  const fig=$("#fig"),W=fig.clientWidth,H=fig.clientHeight;if(!W||!H)return;
+  svg.attr("viewBox",`0 0 ${W} ${H}`);
+  proj=d3.geoNaturalEarth1();
+  if(features.length)proj.fitExtent([[6,6],[W-6,H-6]],{type:"FeatureCollection",features});else proj.fitExtent([[6,6],[W-6,H-6]],{type:"Sphere"});
+  const path=d3.geoPath(proj);
+  gLand.selectAll("*").remove();
+  gLand.append("path").attr("class","grat").attr("d",path(d3.geoGraticule10()));
+  gLand.selectAll("path.country").data(features).enter().append("path")
+    .attr("class",f=>"country"+(f.id==="USA"?" usa":"")+(SOV.has(f.id)?" sov":"")).attr("d",path);
+  if(topo&&obj){try{const m=topojson.merge(topo,obj.geometries.filter(x=>SOV.has(x.id)));gLand.append("path").attr("class","ussr").attr("d",path(m))}catch(e){}}
+  shadeNAM();
+  gLbl.selectAll("*").remove();
+  [["USSR",[95,61],"su"],["USA",[-100,40],"us"]].forEach(([t,ll,c])=>{const p=proj(ll);if(p)gLbl.append("text").attr("class","plab "+c).attr("x",p[0]).attr("y",p[1]).attr("text-anchor","middle").text(t)});
+  zoom.extent([[0,0],[W,H]]).translateExtent([[0,0],[W,H]]);
+  k=1;svg.call(zoom.transform,d3.zoomIdentity);
+  renderMarkers();
+}
+function load(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+async function need(list,test){for(const u of list){if(test())return true;try{await load(u)}catch(e){}}return test()}
+async function boot(){
+  const fig=$("#fig");
+  const okD3=await need(["https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js","https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"],()=>!!(window.d3&&d3.geoNaturalEarth1));
+  if(!okD3){fig.classList.add("fail");return}
+  const okTopo=await need(["https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js","https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"],()=>!!(window.topojson&&topojson.feature));
+  const okWorld=okTopo&&await need(["https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.world.min.js","https://cdn.jsdelivr.net/npm/datamaps@0.5.9/dist/datamaps.world.min.js","https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.4.4/datamaps.world.min.js"],()=>!!(window.Datamap&&Datamap.prototype&&Datamap.prototype.worldTopo));
+  if(okWorld){try{topo=Datamap.prototype.worldTopo;obj=topo.objects.world||topo.objects[Object.keys(topo.objects)[0]];
+    features=topojson.feature(topo,obj).features.filter(f=>f.id!=="ATA")}catch(e){features=[];topo=null}}
+  if(!features.length)$(".hint").textContent="Country outlines could not load (they come from an online map library), so markers are shown on a plain latitude–longitude grid. The list below has every case.";
+  svg=d3.select("#map");g=svg.append("g");gLand=g.append("g");gLbl=g.append("g");gMk=g.append("g");
+  zoom=d3.zoom().scaleExtent([1,10])
+    .filter(ev=>ev.type==="wheel"?(ev.ctrlKey||ev.metaKey):!ev.button)
+    .on("zoom",ev=>{k=ev.transform.k;g.attr("transform",ev.transform);placeMarkers()});
+  svg.call(zoom).on("dblclick.zoom",null);
+  $("#zin").onclick=()=>svg.transition().duration(300).call(zoom.scaleBy,1.7);
+  $("#zout").onclick=()=>svg.transition().duration(300).call(zoom.scaleBy,1/1.7);
+  $("#zrs").onclick=()=>svg.transition().duration(300).call(zoom.transform,d3.zoomIdentity);
+  const pick=ev=>{const it=ev.target.closest&&ev.target.closest(".item");if(it&&vis[+it.dataset.i])openCase(vis[+it.dataset.i].n)};
+  gMk.node().addEventListener("click",pick);
+  gMk.node().addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();pick(ev)}});
+  ready=true;
+  drawMap();
+  let t;new ResizeObserver(()=>{clearTimeout(t);t=setTimeout(drawMap,120)}).observe(fig);
+}
+
+/* ---------- controls ---------- */
+document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>{try{location.hash=b.dataset.d}catch(e){}if(location.hash.slice(1)!==b.dataset.d)setDecade(b.dataset.d)}));
+document.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{const f=c.dataset.f;filt[f]=!filt[f];c.setAttribute("aria-pressed",filt[f]);refresh()}));
+document.querySelector(".cols").addEventListener("click",ev=>{const b=ev.target.closest(".case");if(b)openCase(+b.dataset.n)});
+$("#dClose").onclick=closeCase;$("#dPrev").onclick=()=>step(-1);$("#dNext").onclick=()=>step(1);
+$("#dlg").addEventListener("click",ev=>{if(ev.target.id==="dlg")closeCase()});
+document.addEventListener("keydown",ev=>{if(!$("#dlg").classList.contains("on"))return;if(ev.key==="Escape")closeCase();if(ev.key==="ArrowRight")step(1);if(ev.key==="ArrowLeft")step(-1)});
+window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(DEC.includes(h)&&h!==dec)setDecade(h)});
+let start="1940s";try{const h=location.hash.slice(1);if(DEC.includes(h))start=h}catch(e){}
+setDecade(start);
+boot();
+}
+</script>
+</body>
+</html>
